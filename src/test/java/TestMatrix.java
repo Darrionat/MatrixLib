@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class TestMatrix {
-    public static final String MATRICES_FOLDER = "me/darrionat/matrixlib/matrices" + File.separator;
+    public static final String MATRICES_FOLDER = "testMatrices" + File.separator;
     public static final String SAVED_MATRIX_CSV = MATRICES_FOLDER + "savedMatrix.csv";
     public static final String COMPRESSED_MATRIX = MATRICES_FOLDER + "compressedMatrix.matrix";
 
