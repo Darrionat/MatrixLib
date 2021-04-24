@@ -1,9 +1,9 @@
-package builder;
+package me.darrionat.matrixlib.builder;
 
-import exceptions.DimensionException;
-import exceptions.ReadMatrixException;
-import matrices.Matrix;
-import matrices.SquareMatrix;
+import me.darrionat.matrixlib.exceptions.DimensionException;
+import me.darrionat.matrixlib.exceptions.ReadMatrixException;
+import me.darrionat.matrixlib.matrices.Matrix;
+import me.darrionat.matrixlib.matrices.SquareMatrix;
 
 /**
  * Represents a builder for a matrix.
@@ -164,8 +164,7 @@ public class MatrixBuilder {
     }
 
     /**
-     * Performs a check to see if a string of a {@link Matrix} is
-     * formatted properly.
+     * Performs a check to see if a string of a {@link Matrix} is formatted properly.
      *
      * @param arr   The array of characters to check
      * @param start The required starting character

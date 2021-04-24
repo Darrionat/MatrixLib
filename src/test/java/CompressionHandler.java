@@ -1,6 +1,6 @@
-import builder.MatrixBuilder;
-import exceptions.ReadMatrixException;
-import matrices.Matrix;
+import me.darrionat.matrixlib.builder.MatrixBuilder;
+import me.darrionat.matrixlib.exceptions.ReadMatrixException;
+import me.darrionat.matrixlib.matrices.Matrix;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -26,7 +26,7 @@ public class CompressionHandler {
     public Matrix loadCompressedMatrix(String source) throws IOException, ClassNotFoundException {
         File file = new File(source);
         FileInputStream fin = new FileInputStream(file);
-        byte fileContent[] = new byte[(int) file.length()];
+        byte[] fileContent = new byte[(int) file.length()];
         // Reads up to certain bytes of data from this input stream into an array of bytes.
         fin.read(fileContent);
 

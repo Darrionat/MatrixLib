@@ -1,6 +1,6 @@
-package exceptions;
+package me.darrionat.matrixlib.exceptions;
 
-import matrices.Matrix;
+import me.darrionat.matrixlib.matrices.Matrix;
 
 /**
  * Thrown to indicate that the dimension of a {@link Matrix} is below or equal to 0.
@@ -9,8 +9,7 @@ import matrices.Matrix;
  */
 public class DimensionException extends RuntimeException {
     /**
-     * Constructs a new {@code DimensionException} with an argument
-     * indicating the illegal dimension.
+     * Constructs a new {@code DimensionException} with an argument indicating the illegal dimension.
      *
      * @param dimension the illegal dimension.
      */

@@ -1,4 +1,4 @@
-package vectors;
+package me.darrionat.matrixlib.vectors;
 
 public class Vector {
     private static final String DIMENSION_ERROR = "Vector dimensions are not equal";

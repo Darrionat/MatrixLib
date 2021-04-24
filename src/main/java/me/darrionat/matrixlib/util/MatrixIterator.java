@@ -1,6 +1,6 @@
-package util;
+package me.darrionat.matrixlib.util;
 
-import matrices.Matrix;
+import me.darrionat.matrixlib.matrices.Matrix;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

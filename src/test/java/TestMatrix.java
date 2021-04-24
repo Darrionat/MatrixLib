@@ -1,6 +1,6 @@
-import builder.MatrixBuilder;
-import matrices.Matrix;
-import matrices.SquareMatrix;
+import me.darrionat.matrixlib.builder.MatrixBuilder;
+import me.darrionat.matrixlib.matrices.Matrix;
+import me.darrionat.matrixlib.matrices.SquareMatrix;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class TestMatrix {
-    public static final String MATRICES_FOLDER = "matrices" + File.separator;
+    public static final String MATRICES_FOLDER = "me/darrionat/matrixlib/matrices" + File.separator;
     public static final String SAVED_MATRIX_CSV = MATRICES_FOLDER + "savedMatrix.csv";
     public static final String COMPRESSED_MATRIX = MATRICES_FOLDER + "compressedMatrix.matrix";
 
@@ -61,7 +61,8 @@ public class TestMatrix {
 
         if (SAVE_CSV) {
             time("To CSV");
-            saveToCSV(decompressedMatrix, SAVED_MATRIX_CSV);
+            if (decompressedMatrix != null)
+                saveToCSV(decompressedMatrix, SAVED_MATRIX_CSV);
             endTime("To CSV");
         }
         endTime("WHOLE");
