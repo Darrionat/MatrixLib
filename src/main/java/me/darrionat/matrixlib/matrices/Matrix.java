@@ -1,12 +1,10 @@
 package me.darrionat.matrixlib.matrices;
 
-import me.darrionat.matrixlib.builder.MatrixBuilder;
-import me.darrionat.matrixlib.exceptions.DimensionException;
 import me.darrionat.matrixlib.exceptions.MatrixMultiplicationDimensionException;
 import me.darrionat.matrixlib.util.MatrixIterator;
+import me.darrionat.matrixlib.util.Rational;
 import me.darrionat.matrixlib.vectors.Vector;
 
-import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -14,22 +12,7 @@ import java.util.Objects;
  *
  * @author Darrion Thornburgh
  */
-public class Matrix implements Iterable<Double> {
-    /**
-     * The amount of rows in the matrix, represented as M.
-     */
-    protected int rowAmount;
-    /**
-     * The amount of columns in the matrix, represented as N.
-     */
-    protected int columnAmount;
-    /**
-     * An two dimensional array representing the rows of a matrix and the values within them. <br> E.g. {@code double
-     * value = entries[row][column]}
-     */
-    protected double[][] entries;
-
-
+public class Matrix extends OperableMatrix {
     /**
      * Creates a new MxN matrix.
      *
@@ -47,86 +30,19 @@ public class Matrix implements Iterable<Double> {
      * @param columnAmount The amount of columns in the matrix, represented as N.
      * @param entries      The values within the matrix
      */
-    public Matrix(int rowAmount, int columnAmount, double[][] entries) {
-        if (rowAmount <= 0 || columnAmount <= 0)
-            throw new DimensionException(Math.min(rowAmount, columnAmount));
-        this.rowAmount = rowAmount;
-        this.columnAmount = columnAmount;
-        if (entries == null)
-            entries = new double[rowAmount][columnAmount];
-        this.entries = entries;
+    public Matrix(int rowAmount, int columnAmount, Rational[][] entries) {
+        super(rowAmount, columnAmount, entries);
     }
 
     /**
-     * Gets the values within the matrix.
+     * Determines if the matrix is filled with all zero entries.
      *
-     * @return All values contained within the matrix
+     * @return {@code true} if all entries are zero; {@code false} otherwise.
      */
-    public double[][] getEntries() {
-        return entries;
-    }
-
-    /**
-     * Gets the amount of rows within the matrix.
-     *
-     * @return The amount of rows within the matrix, represented as M.
-     */
-    public int getRowAmount() {
-        return rowAmount;
-    }
-
-    /**
-     * Gets the amount of columns within the matrix.
-     *
-     * @return The amount of columns within the matrix, represented as N.
-     */
-    public int getColumnAmount() {
-        return columnAmount;
-    }
-
-    /**
-     * Gets a value contained within the matrix located at a position.
-     *
-     * @param row    The index of the row.
-     * @param column The index of the column.
-     * @return The value within the matrix at that given row and column.
-     */
-    public double getValue(int row, int column) {
-        return entries[row][column];
-    }
-
-    /**
-     * Sets the value contained within the matrix located a position.
-     *
-     * @param row    The index of the row.
-     * @param column The index of the column.
-     * @param value  The value to set.
-     */
-    public void setValue(int row, int column, double value) {
-        entries[row][column] = value;
-    }
-
-    /**
-     * Gets a row vector within the matrix.
-     *
-     * @param row The index of the row
-     * @return Returns a row vector within the matrix.
-     */
-    public double[] getRow(int row) {
-        return entries[row];
-    }
-
-    /**
-     * Gets a column vector within the matrix.
-     *
-     * @param column The index of the column
-     * @return Returns a column vector within the matrix.
-     */
-    public double[] getColumn(int column) {
-        double[] toReturn = new double[rowAmount];
-        for (int row = 0; row < rowAmount; row++)
-            toReturn[row] = entries[row][column];
-        return toReturn;
+    public boolean isZero() {
+        // There exists a non-zero value within the matrix
+        for (Rational rational : this) if (!rational.zero()) return false;
+        return true;
     }
 
     /**
@@ -134,11 +50,11 @@ public class Matrix implements Iterable<Double> {
      *
      * @param scalar The multiplier
      */
-    public void scale(double scalar) {
+    public void scale(Rational scalar) {
         MatrixIterator iterator = iterator();
         while (iterator.hasNext()) {
-            double value = iterator.next();
-            iterator.setValue(value * scalar);
+            Rational value = iterator.next();
+            iterator.setValue(value.multiply(scalar));
         }
     }
 
@@ -153,20 +69,19 @@ public class Matrix implements Iterable<Double> {
      */
     public Matrix multiply(Matrix multiplier) {
         Objects.requireNonNull(multiplier);
-        // Handle bad dimensions
-
+        // Handle illegal dimensions
         if (columnAmount != multiplier.rowAmount)
             throw new MatrixMultiplicationDimensionException(this, multiplier);
 
         Matrix product = new Matrix(rowAmount, multiplier.columnAmount);
         for (int row = 0; row < rowAmount; row++) {
             // The row to be multiplied along
-            double[] rowVector = getRow(row);
+            Rational[] rowVector = getRow(row);
             for (int col = 0; col < multiplier.columnAmount; col++) {
                 // The vector multiplying the row
-                double[] columnVector = multiplier.getColumn(col);
+                Rational[] columnVector = multiplier.getColumn(col);
                 // Dot product of the two vectors
-                double dotProduct = Vector.getDotProduct(rowVector, columnVector);
+                Rational dotProduct = Vector.getDotProduct(rowVector, columnVector);
                 // Set the position to the dot product
                 product.setValue(row, col, dotProduct);
             }
@@ -174,56 +89,69 @@ public class Matrix implements Iterable<Double> {
         return product;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append(MatrixBuilder.MATRIX_START);
-        for (int row = 0; row < rowAmount; row++) {
-            if (row != 0)
-                s.append(MatrixBuilder.ROW_SEPARATOR);
-            s.append(MatrixBuilder.ROW_START);
-            for (int col = 0; col < columnAmount; col++) {
-                if (col != 0)
-                    s.append(MatrixBuilder.SEPARATOR);
-                s.append(getValue(row, col));
+    /**
+     * Reduces the matrix into row echelon form.
+     */
+    public void ref() {
+        // Already in REF
+        if (rowAmount == 1)
+            return;
+
+        for (int col = 0; col < columnAmount; col++) {
+        /*
+         Determine the leftmost non-zero column and the row of the non-zero entry
+         */
+            int leftMostNonZeroColIndex = -1, nonZeroEntryRow = -1;
+
+            for (int c = col; c < columnAmount; c++) {
+                for (int r = col; r < rowAmount; r++) {
+                    if (getValue(r, c).zero()) continue;
+                    leftMostNonZeroColIndex = c;
+                    nonZeroEntryRow = r;
+                    break;
+                }
+                if (nonZeroEntryRow != -1) break;
             }
-            s.append(MatrixBuilder.ROW_END);
+            // Zero-Matrix
+            if (leftMostNonZeroColIndex == -1) return;
+
+            /*
+            Use elementary row operations to put a 1 in the topmost position (we call this position pivot position) of this column.
+            */
+            // Swap non-zero entry row to top
+            swapRows(col, nonZeroEntryRow);
+            Rational[] leftMostNonZeroCol = getColumn(leftMostNonZeroColIndex);
+            // Puts a 1 in the topmost position of this column
+            // divideRow(col, leftMostNonZeroCol[col]);
+
+            /*
+             Use elementary row operations to put zeros (strictly) below the pivot
+             */
+            for (int r = col + 1; r < rowAmount; r++) {
+                Rational value = getValue(r, leftMostNonZeroColIndex);
+                if (value.zero()) continue;
+                // The value to scale the subtracting row by to make the entry zero
+                Rational c = value.divide(leftMostNonZeroCol[col]);
+                rowSum(r, col, c.negate());
+            }
         }
-        s.append(MatrixBuilder.MATRIX_END);
-        return s.toString();
     }
 
     /**
-     * Checks to see if two non null matrices are equal.
-     *
-     * @param obj the matrix which to compare.
-     * @return {@code true} if both matrices have the same dimensions and values; {@code false} otherwise.
+     * Reduces the matrix into reduced row echelon form.
      */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Matrix))
-            return false;
-        Matrix matrix = (Matrix) obj;
-        if (matrix.getRowAmount() != rowAmount || matrix.getColumnAmount() != columnAmount)
-            return false;
-
-        // Assert: both iterators have the same length
-        MatrixIterator iterator = iterator();
-        MatrixIterator comparedIterator = matrix.iterator();
-        while (iterator.hasNext()) {
-            if (iterator.next() != comparedIterator.next())
-                return false;
-        }
-        // All values are equal in both matrices
-        return true;
-    }
-
-    /**
-     * Creates an {@link Iterator} for a {@link Matrix}.
-     *
-     * @return Returns a matrix iterator.
-     */
-    public MatrixIterator iterator() {
-        return new MatrixIterator(this);
+    public void rref() {
+        // ref();
+        //Step 8. Determine all the leading ones in the row-echelon form obtained in
+        //Step 7.
+        //Step 9. Determine the right most column containing a leading one (we call
+        //this column pivot column).
+        //Step 10. Use type III elementary row operations to erase all the non-zero
+        //entries above the leading one in the pivot column.
+        //Step 11. If there are no more columns containing leading ones to the left of
+        //the pivot column, then go to Step 13.
+        //Step 12. Apply Step 9-11 to the submatrix consisting of the columns that lie
+        //to the left of the pivot column.
+        //13. The resulting matrix is in reduced row-echelon form.
     }
 }

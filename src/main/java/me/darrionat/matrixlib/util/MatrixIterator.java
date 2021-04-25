@@ -1,16 +1,17 @@
 package me.darrionat.matrixlib.util;
 
 import me.darrionat.matrixlib.matrices.Matrix;
+import me.darrionat.matrixlib.matrices.OperableMatrix;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Represents a {@link Iterator} that iterates over a {@link Matrix}.
- * The iterator loops over the matrix from left to right then up to down.
+ * Represents a {@link Iterator} that iterates over a {@link Matrix}. The iterator loops over the matrix from left to
+ * right then up to down.
  */
-public class MatrixIterator implements Iterator<Double> {
-    private final Matrix matrix;
+public class MatrixIterator implements Iterator<Rational> {
+    private final OperableMatrix matrix;
     /**
      * Used for iterating over rows
      */
@@ -20,7 +21,7 @@ public class MatrixIterator implements Iterator<Double> {
      */
     private int j;
 
-    public MatrixIterator(Matrix matrix) {
+    public MatrixIterator(OperableMatrix matrix) {
         this.matrix = matrix;
     }
 
@@ -29,7 +30,7 @@ public class MatrixIterator implements Iterator<Double> {
      *
      * @param value The new value.
      */
-    public void setValue(double value) {
+    public void setValue(Rational value) {
         matrix.setValue(i, j, value);
     }
 
@@ -39,10 +40,9 @@ public class MatrixIterator implements Iterator<Double> {
     }
 
     @Override
-    public Double next() {
+    public Rational next() {
         if (!hasNext())
             throw new NoSuchElementException("There are no remaining values within the Matrix");
-
         if (j == matrix.getColumnAmount() - 1) {
             ++i;
             j = 0;

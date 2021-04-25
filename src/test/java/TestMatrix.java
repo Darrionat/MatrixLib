@@ -1,6 +1,6 @@
-import me.darrionat.matrixlib.builder.MatrixBuilder;
 import me.darrionat.matrixlib.matrices.Matrix;
 import me.darrionat.matrixlib.matrices.SquareMatrix;
+import me.darrionat.matrixlib.util.Rational;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,38 +13,39 @@ public class TestMatrix {
     public static final String SAVED_MATRIX_CSV = MATRICES_FOLDER + "savedMatrix.csv";
     public static final String COMPRESSED_MATRIX = MATRICES_FOLDER + "compressedMatrix.matrix";
 
-    private static final boolean SAVE_CSV = false;
+    private static final boolean SAVE_CSV = true;
 
     public static void main(String[] args) {
         File folder = new File(MATRICES_FOLDER);
         if (!folder.exists())
             folder.mkdir();
         time("WHOLE");
-        int N = 1500;
-        System.out.println("N=" + N);
-        Matrix matrix = new SquareMatrix(N);
-        Matrix matrix2 = new SquareMatrix(N);
+        int N = 500;
 
+        System.out.println("N=" + N);
+        SquareMatrix matrix = new SquareMatrix(N);
+        SquareMatrix matrix2 = new SquareMatrix(N);
+        Matrix m = new Matrix(3, 3);
         Random r = new Random();
         time("Matrix Creation");
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                int r1 = r.nextInt(100);
-                matrix.setValue(i, j, r1);
-                int r2 = r.nextInt(100);
-                matrix2.setValue(i, j, r2);
+        for (int i = 0; i < matrix.getRowAmount(); i++) {
+            for (int j = 0; j < matrix.getColumnAmount(); j++) {
+                int r1 = r.nextInt(5);
+                matrix.setValue(i, j, new Rational(r1, 1));
+                int r2 = r.nextInt(5);
+                matrix2.setValue(i, j, new Rational(r2, 1));
             }
         }
         endTime("Matrix Creation");
 
-        time("Matrix Multiplication");
-        Matrix product = matrix.multiply(matrix2);
-        endTime("Matrix Multiplication");
+        time("Det");
+        // System.out.println(matrix.det());
+        endTime("Det");
 
         time("Compression");
         CompressionHandler compress = new CompressionHandler();
         try {
-            compress.compress(product, COMPRESSED_MATRIX);
+            compress.compress(matrix, COMPRESSED_MATRIX);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,7 +54,7 @@ public class TestMatrix {
         time("Decompression");
         Matrix decompressedMatrix = null;
         try {
-            decompressedMatrix = compress.loadCompressedMatrix(COMPRESSED_MATRIX);
+            decompressedMatrix = compress.loadCompressedMatrix(new File(COMPRESSED_MATRIX));
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -70,11 +71,11 @@ public class TestMatrix {
 
     private static final HashMap<String, Long> TIMES = new HashMap<>();
 
-    private static void time(String timer) {
+    public static void time(String timer) {
         TIMES.put(timer, System.currentTimeMillis());
     }
 
-    private static void endTime(String timer) {
+    public static void endTime(String timer) {
         long time = System.currentTimeMillis() - TIMES.remove(timer);
         System.out.println(timer + " (ms): " + time);
     }
@@ -105,19 +106,19 @@ public class TestMatrix {
         // Set up matrix
         int rows = readInputs.size();
         int cols = readInputs.get(0).length;
-        MatrixBuilder matrix = new MatrixBuilder(rows, cols);
+        Matrix matrix = new Matrix(rows, cols);
         // Read rows
         for (int i = 0; i < rows; i++) {
             String[] rowStr = readInputs.get(i);
-            double[] row = new double[cols];
+            Rational[] row = new Rational[cols];
             // From string to double
             for (int j = 0; j < cols; j++) {
-                row[j] = Double.parseDouble(rowStr[j]);
+                row[j] = Rational.parseRational(rowStr[j]);
             }
             // Insert row into matrix
             matrix.setRow(i, row);
         }
-        return matrix.build();
+        return matrix;
     }
 
     /**
@@ -132,9 +133,9 @@ public class TestMatrix {
         try {
             writer = new FileWriter(file);
             for (int i = 0; i < matrix.getRowAmount(); i++) {
-                double[] row = matrix.getRow(i);
+                Rational[] row = matrix.getRow(i);
                 StringBuilder line = new StringBuilder();
-                for (double v : row) {
+                for (Rational v : row) {
                     if (line.isEmpty()) {
                         line = new StringBuilder("" + v);
                         continue;

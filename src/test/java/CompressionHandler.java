@@ -23,10 +23,9 @@ public class CompressionHandler {
         baos.close();
     }
 
-    public Matrix loadCompressedMatrix(String source) throws IOException, ClassNotFoundException {
-        File file = new File(source);
-        FileInputStream fin = new FileInputStream(file);
-        byte[] fileContent = new byte[(int) file.length()];
+    public Matrix loadCompressedMatrix(File source) throws IOException, ClassNotFoundException {
+        FileInputStream fin = new FileInputStream(source);
+        byte[] fileContent = new byte[(int) source.length()];
         // Reads up to certain bytes of data from this input stream into an array of bytes.
         fin.read(fileContent);
 
@@ -37,9 +36,9 @@ public class CompressionHandler {
         try {
             matrixStr = (String) objectIn.readObject();
         } catch (ArrayStoreException e) {
-            throw new ReadMatrixException(file);
+            throw new ReadMatrixException(source);
         }
         objectIn.close();
-        return MatrixBuilder.fromString(matrixStr);
+        return MatrixBuilder.parseMatrix(matrixStr);
     }
 }
