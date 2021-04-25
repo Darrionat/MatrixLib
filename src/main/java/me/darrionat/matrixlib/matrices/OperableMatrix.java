@@ -26,6 +26,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * value = entries[row][column]}
      */
     protected Rational[][] entries;
+
     /**
      * Creates a new MxN {@code OperableMatrix}.
      *
@@ -48,10 +49,17 @@ public abstract class OperableMatrix implements Iterable<Rational> {
             throw new DimensionException(Math.min(rowAmount, columnAmount));
         this.rowAmount = rowAmount;
         this.columnAmount = columnAmount;
-        if (entries == null)
-            entries = new Rational[rowAmount][columnAmount];
+
+        if (entries == null) {
+            this.entries = new Rational[rowAmount][columnAmount];
+            MatrixIterator iterator = iterator();
+            while (iterator.hasNext())
+                iterator.setValue(Rational.ZERO).next();
+            return;
+        }
         this.entries = entries;
     }
+
     /**
      * Error message for when an incompatible row is given.
      */
@@ -245,6 +253,15 @@ public abstract class OperableMatrix implements Iterable<Rational> {
             Rational toAdd = getValue(addendRow, column).multiply(addendScalar);
             setValue(row, column, getValue(row, column).add(toAdd));
         }
+    }
+
+    /**
+     * Creates a deep copy of this {@code Matrix}.
+     *
+     * @return gets a copy of the matrix.
+     */
+    public Matrix copy() {
+        return new Matrix(rowAmount, columnAmount, entries);
     }
 
     @Override

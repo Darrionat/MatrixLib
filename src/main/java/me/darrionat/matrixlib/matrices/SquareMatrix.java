@@ -52,8 +52,8 @@ public class SquareMatrix extends Matrix {
     public Rational det() {
         ref();
         Rational det = Rational.ONE;
-        for (int row = 0, col = 0; row < rowAmount; row++, col++)
-            det = det.multiply(getValue(row, col));
+        for (int pivot = 0; pivot < rowAmount; pivot++)
+            det = det.multiply(getValue(pivot, pivot));
         return det;
     }
 }

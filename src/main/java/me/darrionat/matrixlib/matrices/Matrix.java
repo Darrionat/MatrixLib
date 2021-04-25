@@ -1,7 +1,7 @@
 package me.darrionat.matrixlib.matrices;
 
+import me.darrionat.matrixlib.exceptions.DimensionException;
 import me.darrionat.matrixlib.exceptions.MatrixMultiplicationDimensionException;
-import me.darrionat.matrixlib.util.MatrixIterator;
 import me.darrionat.matrixlib.util.Rational;
 import me.darrionat.matrixlib.vectors.Vector;
 
@@ -46,22 +46,47 @@ public class Matrix extends OperableMatrix {
     }
 
     /**
-     * Multiplies all values within the entire {@link Matrix} by a given scalar.
+     * Gets the a {@code Matrix} whose values are all a multiple of this matrix's entries by a factor of the {@code
+     * scalar}.
      *
-     * @param scalar The multiplier
+     * @param scalar the multiplier.
      */
-    public void scale(Rational scalar) {
-        MatrixIterator iterator = iterator();
-        while (iterator.hasNext()) {
-            Rational value = iterator.next();
-            iterator.setValue(value.multiply(scalar));
-        }
+    public Matrix scale(Rational scalar) {
+        Matrix scaledMatrix = new Matrix(rowAmount, columnAmount, entries);
+        for (int row = 0; row < rowAmount; row++)
+            for (int col = 0; col < columnAmount; col++)
+                scaledMatrix.setValue(row, col, getValue(row, col).multiply(scalar));
+        return scaledMatrix;
     }
+
+    /**
+     * Get the entrywise sum of this matrix and another matrix.
+     * <p>
+     * The dimensions of this matrix are MxN. The {@code addend} must also be a MxN matrix. The sum will be a MxN
+     * matrix.
+     *
+     * @param addend the matrix being added.
+     * @return calculates the sum of this matrix and another matrix.
+     * @throws DimensionException thrown when the matrices do not have the same dimensions.
+     */
+    public Matrix addEntries(Matrix addend) {
+        if (rowAmount != addend.rowAmount || columnAmount != addend.columnAmount)
+            throw new DimensionException(this, addend);
+
+        Matrix sum = new Matrix(rowAmount, columnAmount);
+        for (int row = 0; row < rowAmount; row++)
+            for (int col = 0; col < columnAmount; col++)
+                // entry = a+b
+                sum.setValue(row, col, getValue(row, col).add(addend.getValue(row, col)));
+        return sum;
+    }
+
 
     /**
      * Get the product of this matrix and another through row column matrix multiplication.
      * <p>
-     * The dimensions of this matrix are MxN. The multiplier must be a NxP matrix. The product will be a MxP matrix.
+     * The dimensions of this matrix are MxN. The {@code multiplier} must be a NxP matrix. The product will be a MxP
+     * matrix.
      *
      * @param multiplier Another matrix that has an amount of rows equal to the amount of columns of this matrix.
      * @return Calculates the product of this matrix and another matrix.
@@ -94,44 +119,31 @@ public class Matrix extends OperableMatrix {
      */
     public void ref() {
         // Already in REF
-        if (rowAmount == 1)
-            return;
+        if (rowAmount == 1) return;
 
+        // Loop from left to right across the matrix
         for (int col = 0; col < columnAmount; col++) {
-        /*
-         Determine the leftmost non-zero column and the row of the non-zero entry
-         */
+            //Determine the leftmost non-zero column and the row of the non-zero entry
             int leftMostNonZeroColIndex = -1, nonZeroEntryRow = -1;
-
-            for (int c = col; c < columnAmount; c++) {
+            for (int c = col; c < columnAmount && nonZeroEntryRow == -1; c++) {
                 for (int r = col; r < rowAmount; r++) {
                     if (getValue(r, c).zero()) continue;
                     leftMostNonZeroColIndex = c;
                     nonZeroEntryRow = r;
                     break;
                 }
-                if (nonZeroEntryRow != -1) break;
             }
             // Zero-Matrix
             if (leftMostNonZeroColIndex == -1) return;
-
-            /*
-            Use elementary row operations to put a 1 in the topmost position (we call this position pivot position) of this column.
-            */
             // Swap non-zero entry row to top
             swapRows(col, nonZeroEntryRow);
-            Rational[] leftMostNonZeroCol = getColumn(leftMostNonZeroColIndex);
-            // Puts a 1 in the topmost position of this column
-            // divideRow(col, leftMostNonZeroCol[col]);
 
-            /*
-             Use elementary row operations to put zeros (strictly) below the pivot
-             */
+            // Use  row operations to put zeros (strictly) below the pivot
             for (int r = col + 1; r < rowAmount; r++) {
                 Rational value = getValue(r, leftMostNonZeroColIndex);
                 if (value.zero()) continue;
                 // The value to scale the subtracting row by to make the entry zero
-                Rational c = value.divide(leftMostNonZeroCol[col]);
+                Rational c = value.divide(getValue(col, leftMostNonZeroColIndex));
                 rowSum(r, col, c.negate());
             }
         }
@@ -141,17 +153,45 @@ public class Matrix extends OperableMatrix {
      * Reduces the matrix into reduced row echelon form.
      */
     public void rref() {
-        // ref();
-        //Step 8. Determine all the leading ones in the row-echelon form obtained in
-        //Step 7.
-        //Step 9. Determine the right most column containing a leading one (we call
-        //this column pivot column).
-        //Step 10. Use type III elementary row operations to erase all the non-zero
-        //entries above the leading one in the pivot column.
-        //Step 11. If there are no more columns containing leading ones to the left of
-        //the pivot column, then go to Step 13.
-        //Step 12. Apply Step 9-11 to the submatrix consisting of the columns that lie
-        //to the left of the pivot column.
-        //13. The resulting matrix is in reduced row-echelon form.
+        ref();
+        // Already in RREF
+        if (rowAmount == 1) return;
+
+        //  Make all leading pivots equal to 1
+        for (int row = 0; row < rowAmount; row++)
+            for (int col = row; col < columnAmount; col++) {
+                Rational value = getValue(row, col);
+                if (!value.zero()) {
+                    divideRow(row, value);
+                    break;
+                }
+            }
+
+        // Loop from bottom to top across the matrix to reduce
+        for (int row = rowAmount - 1; row >= 0; row--) {
+        /*
+         Determine the rightmost column with a containing a leading one (we call this column pivot column).
+         */
+            int pivotRow = -1, pivotCol = -1;
+            for (int r = row; r >= 0 && pivotRow == -1; r--) {
+                for (int c = 0; c < columnAmount; c++) {
+                    if (!getValue(r, c).equals(Rational.ONE)) continue;
+                    pivotRow = r;
+                    pivotCol = c;
+                    break;
+                }
+            }
+            // Zero-Matrix
+            if (pivotRow == -1) return;
+            /*
+             * Use row operations to erase all the non-zero entries above the leading one in the pivot column.
+             */
+            for (int r = pivotRow - 1; r >= 0; r--) {
+                Rational value = getValue(r, pivotCol);
+                if (value.zero()) continue;
+                // The value to scale the subtracting row by to make the entry zero
+                rowSum(r, row, getValue(r, pivotCol).negate());
+            }
+        }
     }
 }

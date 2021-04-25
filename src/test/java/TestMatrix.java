@@ -20,7 +20,7 @@ public class TestMatrix {
         if (!folder.exists())
             folder.mkdir();
         time("WHOLE");
-        int N = 500;
+        int N = 5;
 
         System.out.println("N=" + N);
         SquareMatrix matrix = new SquareMatrix(N);
@@ -39,8 +39,10 @@ public class TestMatrix {
         endTime("Matrix Creation");
 
         time("Det");
-        // System.out.println(matrix.det());
+        print(matrix);
+        System.out.println(matrix.det());
         endTime("Det");
+
 
         time("Compression");
         CompressionHandler compress = new CompressionHandler();

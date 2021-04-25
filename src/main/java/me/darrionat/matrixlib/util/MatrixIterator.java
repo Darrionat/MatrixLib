@@ -15,11 +15,11 @@ public class MatrixIterator implements Iterator<Rational> {
     /**
      * Used for iterating over rows
      */
-    private int i;
+    private int i = 0;
     /**
      * Used for iterating over columns
      */
-    private int j;
+    private int j = 0;
 
     public MatrixIterator(OperableMatrix matrix) {
         this.matrix = matrix;
@@ -28,10 +28,12 @@ public class MatrixIterator implements Iterator<Rational> {
     /**
      * Sets the value of the current position within the {@link Matrix}.
      *
-     * @param value The new value.
+     * @param value the new value.
+     * @return the iterator.
      */
-    public void setValue(Rational value) {
+    public MatrixIterator setValue(Rational value) {
         matrix.setValue(i, j, value);
+        return this;
     }
 
     @Override

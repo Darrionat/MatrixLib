@@ -2,6 +2,7 @@ package me.darrionat.matrixlib.builder;
 
 import me.darrionat.matrixlib.exceptions.ReadMatrixException;
 import me.darrionat.matrixlib.matrices.Matrix;
+import me.darrionat.matrixlib.matrices.SquareMatrix;
 import me.darrionat.matrixlib.util.Rational;
 
 /**
@@ -38,6 +39,9 @@ public class MatrixBuilder {
 
     /**
      * Builds a {@link Matrix} from an input string. The matrix must be formatted properly.
+     * <p>
+     * If there are an equal amount of rows and columns, the {@code Matrix} will be an instance of {@link
+     * SquareMatrix}.
      *
      * @param matrixString A matrix in the form of a string.
      * @return Returns a built matrix created from a string.
@@ -47,26 +51,27 @@ public class MatrixBuilder {
         assertValidChars(chars, MATRIX_START, MATRIX_END);
 
         String[] allRows = matrixString.replace(MATRIX_START + "", "").replace(MATRIX_END + "", "").split(ROW_SEPARATOR);
+
         int rows = allRows.length;
-
+        // Unknown at this point will be determined
         int columns = 0;
-        Matrix matrix = null;
 
+        Matrix matrix = null;
         for (int row = 0; row < rows; row++) {
             char[] rowChars = allRows[row].toCharArray();
             assertValidChars(rowChars, ROW_START, ROW_END);
 
-            // Split
+            // Split the column
             String[] colValues = allRows[row].replace(ROW_START + "", "").replace(ROW_END + "", "").split(SEPARATOR);
 
             // Init builder
             if (matrix == null) {
                 columns = colValues.length;
-                matrix = new Matrix(rows, columns);
+                matrix = rows == columns ? new SquareMatrix(rows) : new Matrix(rows, columns);
             }
-            for (int col = 0; col < columns; col++) {
+            // Set values
+            for (int col = 0; col < columns; col++)
                 matrix.setValue(row, col, Rational.parseRational(colValues[col]));
-            }
         }
         if (matrix == null) throw new NullPointerException("Empty Matrix");
         return matrix;
