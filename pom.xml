@@ -6,9 +6,4 @@
     <groupId>me.darrionat</groupId>
     <artifactId>MatrixLib</artifactId>
     <version>1.2.1</version>
-
-    <properties>
-        <maven.compiler.source>13</maven.compiler.source>
-        <maven.compiler.target>13</maven.compiler.target>
-    </properties>
 </project>
