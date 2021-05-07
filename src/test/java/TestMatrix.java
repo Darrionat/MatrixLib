@@ -20,7 +20,7 @@ public class TestMatrix {
         if (!folder.exists())
             folder.mkdir();
         time("WHOLE");
-        int N = 5;
+        int N = 500;
 
         System.out.println("N=" + N);
         SquareMatrix matrix = new SquareMatrix(N);
@@ -39,7 +39,6 @@ public class TestMatrix {
         endTime("Matrix Creation");
 
         time("Det");
-        print(matrix);
         System.out.println(matrix.det());
         endTime("Det");
 
@@ -138,7 +137,7 @@ public class TestMatrix {
                 Rational[] row = matrix.getRow(i);
                 StringBuilder line = new StringBuilder();
                 for (Rational v : row) {
-                    if (line.isEmpty()) {
+                    if (line.length() == 0) {
                         line = new StringBuilder("" + v);
                         continue;
                     }

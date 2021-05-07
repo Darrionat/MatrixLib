@@ -8,6 +8,8 @@ import me.darrionat.matrixlib.util.Rational;
  * A {@code IdentityMatrix} is immutable.
  * <p>
  * Identity matrices are always triangular and always have a determinant of 1.
+ *
+ * @author Darrion Thornburgh
  */
 public final class IdentityMatrix extends SquareMatrix {
     /**

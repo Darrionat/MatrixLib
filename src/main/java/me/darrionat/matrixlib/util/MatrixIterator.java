@@ -9,6 +9,8 @@ import java.util.NoSuchElementException;
 /**
  * Represents a {@link Iterator} that iterates over a {@link Matrix}. The iterator loops over the matrix from left to
  * right then up to down.
+ *
+ * @author Darrion Thornburgh
  */
 public class MatrixIterator implements Iterator<Rational> {
     private final OperableMatrix matrix;

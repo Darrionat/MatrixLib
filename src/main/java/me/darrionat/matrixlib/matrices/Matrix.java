@@ -3,7 +3,6 @@ package me.darrionat.matrixlib.matrices;
 import me.darrionat.matrixlib.exceptions.DimensionException;
 import me.darrionat.matrixlib.exceptions.MatrixMultiplicationDimensionException;
 import me.darrionat.matrixlib.util.Rational;
-import me.darrionat.matrixlib.vectors.Vector;
 
 import java.util.Objects;
 
@@ -13,6 +12,8 @@ import java.util.Objects;
  * @author Darrion Thornburgh
  */
 public class Matrix extends OperableMatrix {
+    private static final String DIMENSION_ERROR = "Vector dimensions are not equal";
+
     /**
      * Creates a new MxN matrix.
      *
@@ -40,8 +41,8 @@ public class Matrix extends OperableMatrix {
      * @return {@code true} if all entries are zero; {@code false} otherwise.
      */
     public boolean isZero() {
-        // There exists a non-zero value within the matrix
-        for (Rational rational : this) if (!rational.zero()) return false;
+        for (Rational rational : this)
+            if (!rational.zero()) return false;
         return true;
     }
 
@@ -106,7 +107,7 @@ public class Matrix extends OperableMatrix {
                 // The vector multiplying the row
                 Rational[] columnVector = multiplier.getColumn(col);
                 // Dot product of the two vectors
-                Rational dotProduct = Vector.getDotProduct(rowVector, columnVector);
+                Rational dotProduct = getDotProduct(rowVector, columnVector);
                 // Set the position to the dot product
                 product.setValue(row, col, dotProduct);
             }
@@ -123,27 +124,27 @@ public class Matrix extends OperableMatrix {
 
         // Loop from left to right across the matrix
         for (int col = 0; col < columnAmount; col++) {
-            //Determine the leftmost non-zero column and the row of the non-zero entry
-            int leftMostNonZeroColIndex = -1, nonZeroEntryRow = -1;
+            // Determine the leftmost non-zero column and the row of the non-zero entry
+            int leftMostNonZeroCol = -1, nonZeroEntryRow = -1;
             for (int c = col; c < columnAmount && nonZeroEntryRow == -1; c++) {
                 for (int r = col; r < rowAmount; r++) {
                     if (getValue(r, c).zero()) continue;
-                    leftMostNonZeroColIndex = c;
+                    leftMostNonZeroCol = c;
                     nonZeroEntryRow = r;
                     break;
                 }
             }
             // Zero-Matrix
-            if (leftMostNonZeroColIndex == -1) return;
+            if (leftMostNonZeroCol == -1) return;
             // Swap non-zero entry row to top
             swapRows(col, nonZeroEntryRow);
 
             // Use  row operations to put zeros (strictly) below the pivot
             for (int r = col + 1; r < rowAmount; r++) {
-                Rational value = getValue(r, leftMostNonZeroColIndex);
+                Rational value = getValue(r, leftMostNonZeroCol);
                 if (value.zero()) continue;
                 // The value to scale the subtracting row by to make the entry zero
-                Rational c = value.divide(getValue(col, leftMostNonZeroColIndex));
+                Rational c = value.divide(getValue(col, leftMostNonZeroCol));
                 rowSum(r, col, c.negate());
             }
         }
@@ -169,9 +170,8 @@ public class Matrix extends OperableMatrix {
 
         // Loop from bottom to top across the matrix to reduce
         for (int row = rowAmount - 1; row >= 0; row--) {
-        /*
-         Determine the rightmost column with a containing a leading one (we call this column pivot column).
-         */
+
+            // Determine the rightmost column containing a leading one.
             int pivotRow = -1, pivotCol = -1;
             for (int r = row; r >= 0 && pivotRow == -1; r--) {
                 for (int c = 0; c < columnAmount; c++) {
@@ -193,5 +193,23 @@ public class Matrix extends OperableMatrix {
                 rowSum(r, row, getValue(r, pivotCol).negate());
             }
         }
+    }
+
+    /**
+     * Calculates the dot product of two vectors of same dimension.
+     *
+     * @param v The first vector
+     * @param u The second vector
+     * @return Returns the dot product of two vectors
+     * @throws IllegalArgumentException thrown when the vectors' dimensions are not equal.
+     */
+    private static Rational getDotProduct(Rational[] v, Rational[] u) {
+        if (v.length != u.length)
+            throw new IllegalArgumentException(DIMENSION_ERROR);
+
+        Rational dotProduct = Rational.ZERO;
+        for (int i = 0; i < v.length; i++)
+            dotProduct = dotProduct.add(v[i].multiply(u[i]));
+        return dotProduct;
     }
 }

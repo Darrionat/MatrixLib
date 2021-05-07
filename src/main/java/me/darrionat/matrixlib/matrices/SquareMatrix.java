@@ -44,16 +44,16 @@ public class SquareMatrix extends Matrix {
     }
 
     /**
-     * Calculates the determinant of the {@code SquareMatrix} and by consequence puts the matrix into reduced echelon
-     * form.
+     * Calculates the determinant of the {@code SquareMatrix}.
      *
      * @return the determinant of the matrix.
      */
     public Rational det() {
-        ref();
+        Matrix copy = copy();
+        copy.ref();
         Rational det = Rational.ONE;
         for (int pivot = 0; pivot < rowAmount; pivot++)
-            det = det.multiply(getValue(pivot, pivot));
+            det = det.multiply(copy.getValue(pivot, pivot));
         return det;
     }
 }
