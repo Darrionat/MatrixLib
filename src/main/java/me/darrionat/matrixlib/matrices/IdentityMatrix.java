@@ -1,6 +1,6 @@
 package me.darrionat.matrixlib.matrices;
 
-import me.darrionat.matrixlib.util.Rational;
+import me.darrionat.matrixlib.algebra.sets.Rational;
 
 /**
  * Represents the identity matrix for a particular NxN sized matrix.

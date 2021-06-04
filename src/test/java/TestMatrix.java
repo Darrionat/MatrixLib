@@ -1,11 +1,12 @@
 import me.darrionat.matrixlib.matrices.Matrix;
 import me.darrionat.matrixlib.matrices.SquareMatrix;
-import me.darrionat.matrixlib.util.Rational;
+import me.darrionat.matrixlib.algebra.sets.Rational;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.*;
 
 public class TestMatrix {
@@ -30,10 +31,10 @@ public class TestMatrix {
         time("Matrix Creation");
         for (int i = 0; i < matrix.getRowAmount(); i++) {
             for (int j = 0; j < matrix.getColumnAmount(); j++) {
-                int r1 = r.nextInt(5);
-                matrix.setValue(i, j, new Rational(r1, 1));
-                int r2 = r.nextInt(5);
-                matrix2.setValue(i, j, new Rational(r2, 1));
+                BigInteger r1 = new BigInteger("" + r.nextInt(5));
+                matrix.setValue(i, j, new Rational(r1, BigInteger.ONE));
+                BigInteger r2 = new BigInteger("" + r.nextInt(5));
+                matrix2.setValue(i, j, new Rational(r2, BigInteger.ONE));
             }
         }
         endTime("Matrix Creation");

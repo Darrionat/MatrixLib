@@ -1,6 +1,6 @@
 package me.darrionat.matrixlib.matrices;
 
-import me.darrionat.matrixlib.util.Rational;
+import me.darrionat.matrixlib.algebra.sets.Rational;
 
 /**
  * Represents an NxN {@link Matrix} with an equal amount of rows and columns.

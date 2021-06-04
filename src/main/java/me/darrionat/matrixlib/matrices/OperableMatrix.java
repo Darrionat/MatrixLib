@@ -3,7 +3,7 @@ package me.darrionat.matrixlib.matrices;
 import me.darrionat.matrixlib.builder.MatrixBuilder;
 import me.darrionat.matrixlib.exceptions.DimensionException;
 import me.darrionat.matrixlib.util.MatrixIterator;
-import me.darrionat.matrixlib.util.Rational;
+import me.darrionat.matrixlib.algebra.sets.Rational;
 
 import java.util.Iterator;
 

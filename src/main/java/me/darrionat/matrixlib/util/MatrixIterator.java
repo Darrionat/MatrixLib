@@ -1,5 +1,6 @@
 package me.darrionat.matrixlib.util;
 
+import me.darrionat.matrixlib.algebra.sets.Rational;
 import me.darrionat.matrixlib.matrices.Matrix;
 import me.darrionat.matrixlib.matrices.OperableMatrix;
 

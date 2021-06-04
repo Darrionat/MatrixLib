@@ -3,7 +3,7 @@ package me.darrionat.matrixlib.builder;
 import me.darrionat.matrixlib.exceptions.ReadMatrixException;
 import me.darrionat.matrixlib.matrices.Matrix;
 import me.darrionat.matrixlib.matrices.SquareMatrix;
-import me.darrionat.matrixlib.util.Rational;
+import me.darrionat.matrixlib.algebra.sets.Rational;
 
 /**
  * Provides methods for creating matrices from strings.

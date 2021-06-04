@@ -2,7 +2,7 @@ package me.darrionat.matrixlib.matrices;
 
 import me.darrionat.matrixlib.exceptions.DimensionException;
 import me.darrionat.matrixlib.exceptions.MatrixMultiplicationDimensionException;
-import me.darrionat.matrixlib.util.Rational;
+import me.darrionat.matrixlib.algebra.sets.Rational;
 
 import java.util.Objects;
 
