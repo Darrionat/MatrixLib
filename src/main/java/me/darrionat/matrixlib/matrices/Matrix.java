@@ -1,8 +1,10 @@
 package me.darrionat.matrixlib.matrices;
 
+import me.darrionat.matrixlib.algebra.sets.Complex;
+import me.darrionat.matrixlib.algebra.sets.Number;
+import me.darrionat.matrixlib.algebra.sets.Rational;
 import me.darrionat.matrixlib.exceptions.DimensionException;
 import me.darrionat.matrixlib.exceptions.MatrixMultiplicationDimensionException;
-import me.darrionat.matrixlib.algebra.sets.Rational;
 
 import java.util.Objects;
 
@@ -31,7 +33,7 @@ public class Matrix extends OperableMatrix {
      * @param columnAmount The amount of columns in the matrix, represented as N.
      * @param entries      The values within the matrix
      */
-    public Matrix(int rowAmount, int columnAmount, Rational[][] entries) {
+    public Matrix(int rowAmount, int columnAmount, Number[][] entries) {
         super(rowAmount, columnAmount, entries);
     }
 
@@ -41,8 +43,8 @@ public class Matrix extends OperableMatrix {
      * @return {@code true} if all entries are zero; {@code false} otherwise.
      */
     public boolean isZero() {
-        for (Rational rational : this)
-            if (!rational.zero()) return false;
+        for (Number value : this)
+            if (!value.zero()) return false;
         return true;
     }
 
@@ -102,12 +104,12 @@ public class Matrix extends OperableMatrix {
         Matrix product = new Matrix(rowAmount, multiplier.columnAmount);
         for (int row = 0; row < rowAmount; row++) {
             // The row to be multiplied along
-            Rational[] rowVector = getRow(row);
+            Number[] rowVector = getRow(row);
             for (int col = 0; col < multiplier.columnAmount; col++) {
                 // The vector multiplying the row
-                Rational[] columnVector = multiplier.getColumn(col);
+                Number[] columnVector = multiplier.getColumn(col);
                 // Dot product of the two vectors
-                Rational dotProduct = getDotProduct(rowVector, columnVector);
+                Number dotProduct = getDotProduct(rowVector, columnVector);
                 // Set the position to the dot product
                 product.setValue(row, col, dotProduct);
             }
@@ -141,10 +143,10 @@ public class Matrix extends OperableMatrix {
 
             // Use  row operations to put zeros (strictly) below the pivot
             for (int r = col + 1; r < rowAmount; r++) {
-                Rational value = getValue(r, leftMostNonZeroCol);
+                Number value = getValue(r, leftMostNonZeroCol);
                 if (value.zero()) continue;
                 // The value to scale the subtracting row by to make the entry zero
-                Rational c = value.divide(getValue(col, leftMostNonZeroCol));
+                Number c = value.divide(getValue(col, leftMostNonZeroCol));
                 rowSum(r, col, c.negate());
             }
         }
@@ -161,7 +163,7 @@ public class Matrix extends OperableMatrix {
         //  Make all leading pivots equal to 1
         for (int row = 0; row < rowAmount; row++)
             for (int col = row; col < columnAmount; col++) {
-                Rational value = getValue(row, col);
+                Number value = getValue(row, col);
                 if (!value.zero()) {
                     divideRow(row, value);
                     break;
@@ -187,7 +189,7 @@ public class Matrix extends OperableMatrix {
              * Use row operations to erase all the non-zero entries above the leading one in the pivot column.
              */
             for (int r = pivotRow - 1; r >= 0; r--) {
-                Rational value = getValue(r, pivotCol);
+                Number value = getValue(r, pivotCol);
                 if (value.zero()) continue;
                 // The value to scale the subtracting row by to make the entry zero
                 rowSum(r, row, getValue(r, pivotCol).negate());
@@ -203,11 +205,11 @@ public class Matrix extends OperableMatrix {
      * @return Returns the dot product of two vectors
      * @throws IllegalArgumentException thrown when the vectors' dimensions are not equal.
      */
-    private static Rational getDotProduct(Rational[] v, Rational[] u) {
+    private static Number getDotProduct(Number[] v, Number[] u) {
         if (v.length != u.length)
             throw new IllegalArgumentException(DIMENSION_ERROR);
 
-        Rational dotProduct = Rational.ZERO;
+        Number dotProduct = Complex.ZERO;
         for (int i = 0; i < v.length; i++)
             dotProduct = dotProduct.add(v[i].multiply(u[i]));
         return dotProduct;

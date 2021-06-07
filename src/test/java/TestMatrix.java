@@ -1,6 +1,7 @@
+import me.darrionat.matrixlib.algebra.sets.Number;
+import me.darrionat.matrixlib.algebra.sets.Rational;
 import me.darrionat.matrixlib.matrices.Matrix;
 import me.darrionat.matrixlib.matrices.SquareMatrix;
-import me.darrionat.matrixlib.algebra.sets.Rational;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -135,9 +136,9 @@ public class TestMatrix {
         try {
             writer = new FileWriter(file);
             for (int i = 0; i < matrix.getRowAmount(); i++) {
-                Rational[] row = matrix.getRow(i);
+                Number[] row = matrix.getRow(i);
                 StringBuilder line = new StringBuilder();
-                for (Rational v : row) {
+                for (Number v : row) {
                     if (line.length() == 0) {
                         line = new StringBuilder("" + v);
                         continue;

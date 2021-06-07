@@ -10,7 +10,7 @@ import java.math.BigInteger;
  *
  * @author Robert Sedgewick, Kevin Wayne, and Darrion Thornburgh
  */
-public class Rational extends NumberSet<Rational> {
+public class Rational extends Number {
     /**
      * The {@code Rational} representation of {@code 0}.
      */
@@ -100,6 +100,15 @@ public class Rational extends NumberSet<Rational> {
         return this.equals(ZERO);
     }
 
+    @Override
+    public int toInt() throws ArithmeticException {
+        try {
+            return Integer.parseInt(toBigInteger().toString());
+        } catch (NumberFormatException e) {
+            throw new ArithmeticException("Out of int bounds");
+        }
+    }
+
 
     /**
      * Gets the mediant of two rational numbers.
@@ -145,37 +154,71 @@ public class Rational extends NumberSet<Rational> {
         return m.multiply(n.divide(gcd(m, n)));
     }
 
-    public Rational add(Rational b) {
+    public Number add(Number b) {
+        if (b instanceof Complex) {
+            Complex complex = (Complex) b;
+            return complex.add(b);
+        }
+        assert b instanceof Rational;
+        Rational rational = (Rational) b;
         Rational a = this;
-        if (a.den.equals(b.den)) return new Rational(a.num.add(b.num), a.den);
+        if (a.den.equals(rational.den)) return new Rational(a.num.add(rational.num), a.den);
         // Base cases
         if (a.equals(ZERO)) return b;
         if (b.equals(ZERO)) return a;
 
         // Find gcd of numerators and denominators
-        BigInteger f = gcd(a.num, b.num);
-        BigInteger g = gcd(a.den, b.den);
+        BigInteger f = gcd(a.num, rational.num);
+        BigInteger g = gcd(a.den, rational.den);
 
         // Add cross-product terms for numerator
         // x = (a.num / f) * (b.den / g) + (b.num / f) * (a.den / g)
         // num = x*f
-        BigInteger left = a.num.divide(f).multiply(b.den.divide(g));
-        BigInteger right = b.num.divide(f).multiply(a.den.divide(g));
+        BigInteger left = a.num.divide(f).multiply(rational.den.divide(g));
+        BigInteger right = rational.num.divide(f).multiply(a.den.divide(g));
         BigInteger crossProduct = left.add(right);
-        return new Rational(crossProduct.multiply(f), lcm(a.den, b.den));
+        return new Rational(crossProduct.multiply(f), lcm(a.den, rational.den));
     }
 
-    public Rational subtract(Rational b) {
+    public Number subtract(Number b) {
         return add(b.negate());
     }
 
-    public Rational multiply(Rational b) {
-        return new Rational(num.multiply(b.num), den.multiply(b.den));
+
+    public Number multiply(Number b) {
+        if (b instanceof Complex) {
+            Complex complex = (Complex) b;
+            return complex.multiply(b);
+        }
+        assert b instanceof Rational;
+        Rational rational = (Rational) b;
+        return new Rational(num.multiply(rational.num), den.multiply(rational.den));
     }
 
-    public Rational divide(Rational b) {
-        Rational a = this;
-        return a.multiply(b.reciprocal());
+    public Number divide(Number b) {
+        if (b instanceof Complex) {
+            Complex complex = (Complex) b;
+            return complex.pow(-1).multiply(this);
+        }
+        assert b instanceof Rational;
+        Rational rational = (Rational) b;
+        return multiply(rational.reciprocal());
+    }
+
+    public Rational addRational(Rational b) {
+        return (Rational) add(b);
+    }
+
+    public Rational subtractRational(Rational b) {
+        return (Rational) subtract(b);
+    }
+
+    public Rational multiplyRational(Rational b) {
+        return (Rational) multiply(b);
+    }
+
+    public Rational divideRational(Rational b) {
+        return (Rational) divide(b);
     }
 
     public Rational negate() {
@@ -243,12 +286,17 @@ public class Rational extends NumberSet<Rational> {
      * @param b The Rational to compare to.
      * @return returns an integer that is the comparison between the two rationals.
      */
-    @Override
-    public int compareTo(Rational b) {
+    public int compareTo(Number b) {
+        if (b instanceof Complex) {
+            Complex complex = (Complex) b;
+            return complex.compareTo(this);
+        }
+        assert b instanceof Rational;
+        Rational rational = (Rational) b;
         // Left-hand side
-        BigInteger lhs = num.multiply(b.den);
+        BigInteger lhs = num.multiply(rational.den);
         // Right-hand side
-        BigInteger rhs = den.multiply(b.num);
+        BigInteger rhs = den.multiply(rational.num);
         return lhs.compareTo(rhs);
     }
 

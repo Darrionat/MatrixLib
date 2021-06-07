@@ -1,5 +1,6 @@
 package me.darrionat.matrixlib.matrices;
 
+import me.darrionat.matrixlib.algebra.sets.Number;
 import me.darrionat.matrixlib.algebra.sets.Rational;
 
 /**
@@ -27,15 +28,15 @@ public final class IdentityMatrix extends SquareMatrix {
     }
 
     @Override
-    public final void setColumn(int column, Rational[] values) {
+    public final void setColumn(int column, Number[] values) {
     }
 
     @Override
-    public final void setRow(int row, Rational[] values) {
+    public final void setRow(int row, Number[] values) {
     }
 
     @Override
-    public final void setValue(int row, int column, Rational value) {
+    public final void setValue(int row, int column, Number value) {
     }
 
     @Override
@@ -47,19 +48,19 @@ public final class IdentityMatrix extends SquareMatrix {
     }
 
     @Override
-    public final void multiplyRow(int row, Rational scalar) {
+    public final void multiplyRow(int row, Number scalar) {
     }
 
     @Override
-    public final void divideRow(int row, Rational dividend) {
+    public final void divideRow(int row, Number dividend) {
     }
 
     @Override
-    public final void multiplyColumn(int column, Rational scalar) {
+    public final void multiplyColumn(int column, Number scalar) {
     }
 
     @Override
-    public final void divideColumn(int column, Rational dividend) {
+    public final void divideColumn(int column, Number dividend) {
     }
 
     @Override

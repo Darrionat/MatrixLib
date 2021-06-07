@@ -10,7 +10,8 @@ import java.util.HashMap;
  *
  * @author Darrion Thornburgh
  */
-public class Complex extends NumberSet<Complex> {
+public class Complex extends Number {
+
     /**
      * The complex representation of zero.
      */
@@ -26,7 +27,7 @@ public class Complex extends NumberSet<Complex> {
      *
      * @see #pow(int)
      */
-    private final HashMap<Integer, Complex> powers = new HashMap<>();
+    private final HashMap<Integer, Number> powers = new HashMap<>();
 
     /**
      * The real value in the complex plane.
@@ -71,48 +72,68 @@ public class Complex extends NumberSet<Complex> {
     }
 
     @Override
-    public Complex add(Complex b) {
-        return new Complex(real.add(real), scalar.add(b.scalar));
-    }
-
-    @Override
-    public Complex subtract(Complex b) {
-        return add(b.negate());
-    }
-
-    @Override
-    public Complex multiply(Complex b) {
-        /*
-            (a+bi)(c+di) = ac+adi+bci+bdi^2 = ac+bdi^2+adi+bci
-            = (ac - bd) + (ad + bc)i
-         */
-        // Real = ac - bd
-        Rational r = real.multiply(b.real).subtract(scalar.multiply(b.scalar));
-        // Imaginary = (ad+bc)i
-        Rational c = real.multiply(b.scalar).add(scalar.multiply(b.real));
+    public Number add(Number b) {
+        if (b instanceof Rational) {
+            Rational rationalB = (Rational) b;
+            return new Complex((Rational) real.add(rationalB), scalar);
+        }
+        assert b instanceof Complex;
+        Complex complex = (Complex) b;
+        Rational r = (Rational) real.add(complex.real);
+        Rational c = (Rational) scalar.add(complex.scalar);
         return new Complex(r, c);
     }
 
     @Override
-    public Complex divide(Complex b) {
+    public Number subtract(Number b) {
+        return add(b.negate());
+    }
+
+    @Override
+    public Number multiply(Number b) {
+        if (b instanceof Rational) {
+            Rational rationalB = (Rational) b;
+            return new Complex(real.multiplyRational(rationalB), scalar.multiplyRational(rationalB));
+        }
+        /*
+           (a+bi)(c+di) = ac+adi+bci+bdi^2 = ac+bdi^2+adi+bci
+           = (ac - bd) + (ad + bc)i
+         */
+        assert b instanceof Complex;
+        Complex complex = (Complex) b;
+        // Real = ac - bd
+        Rational r = real.multiplyRational(complex.real).subtractRational(scalar.multiplyRational(complex.scalar));
+        // Imaginary = (ad+bc)i
+        Rational c = real.multiplyRational(complex.scalar).addRational(scalar.multiplyRational(complex.real));
+        return new Complex(r, c);
+    }
+
+    @Override
+    public Number divide(Number b) {
+        if (b instanceof Rational) {
+            Rational rationalB = (Rational) b;
+            return new Complex(real.divideRational(rationalB), scalar.divideRational(rationalB));
+        }
         /*
            (a+bi)   (c-di)   (ac-bd) + (bc-ad)i
            ------ * ------ = ------------------
            (c+di)   (c-di)       c^2 + cd
          */
+        assert b instanceof Complex;
+        Complex complex = (Complex) b;
         // c^2 + cd
-        Rational divisor = b.real.pow(2).add(b.real.multiply(b.scalar));
+        Rational divisor = complex.real.pow(2).addRational(complex.real.multiplyRational(complex.scalar));
         // Real = (ac-bd)/(c^2+cd)
-        Rational r = real.multiply(b.real).subtract(scalar.multiply(b.scalar));
+        Rational r = real.multiplyRational(complex.real).subtractRational(scalar.multiplyRational(complex.scalar));
         // Imaginary = (bc-ad)i/(c^2+cd)
-        Rational c = scalar.multiply(b.real).subtract(real.multiply(b.scalar));
+        Rational c = scalar.multiplyRational(complex.real).subtractRational(real.multiplyRational(complex.scalar));
         // Divide r and c by divisor
-        return new Complex(r.divide(divisor), c.divide(divisor));
+        return new Complex(r.divideRational(divisor), c.divideRational(divisor));
     }
 
 
     @Override
-    public Complex pow(int pow) {
+    public Number pow(int pow) {
         if (powers.containsKey(pow))
             return powers.get(pow);
 
@@ -124,12 +145,12 @@ public class Complex extends NumberSet<Complex> {
         for (int i = binary.length() - 2, expo = 1; i >= 0; i--, expo++) {
             int powerOfTwo = (int) Math.pow(2, expo);
             // Get the previous power of two, e.g. 32 -> 16
-            Complex prev = powers.get(powerOfTwo / 2);
+            Number prev = powers.get(powerOfTwo / 2);
             // Get this current power of two e.g. 32 -> complex ^ 2
             powers.put(powerOfTwo, prev.multiply(prev));
         }
 
-        Complex result = ONE;
+        Number result = ONE;
         for (int i = binary.length() - 1, expo = 0; i >= 0; i--, expo++) {
             int powerOfTwo = (int) Math.pow(2, expo);
             if (binary.charAt(i) == '1')
@@ -146,6 +167,12 @@ public class Complex extends NumberSet<Complex> {
     @Override
     public boolean zero() {
         return real.zero() && scalar.zero();
+    }
+
+    @Override
+    public int toInt() throws ArithmeticException {
+        if (!isReal()) throw new ArithmeticException("Imaginary value");
+        return toRational().toInt();
     }
 
     /**
@@ -180,11 +207,19 @@ public class Complex extends NumberSet<Complex> {
      * @see #equals(Object)
      */
     @Override
-    public int compareTo(Complex b) {
+    public int compareTo(Number b) {
+        Complex compare;
+        if (b instanceof Complex)
+            compare = (Complex) b;
+        else {
+            assert b instanceof Rational;
+            compare = new Complex((Rational) b, Rational.ZERO);
+        }
         if (equals(b)) return 0;
-        Rational rDiffSqr = real.subtract(b.real).pow(2);
-        Rational cDiffSqr = scalar.subtract(b.scalar).pow(2);
-        BigInteger distance = rDiffSqr.add(cDiffSqr).toBigInteger().sqrt();
+
+        Rational rDiffSqr = real.subtractRational(compare.real).pow(2);
+        Rational cDiffSqr = scalar.subtractRational(compare.scalar).pow(2);
+        BigInteger distance = rDiffSqr.addRational(cDiffSqr).toBigInteger().sqrt();
         try {
             return Integer.parseInt(distance.toString());
         } catch (NumberFormatException e) {

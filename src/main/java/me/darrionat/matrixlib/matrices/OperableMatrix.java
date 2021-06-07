@@ -1,9 +1,10 @@
 package me.darrionat.matrixlib.matrices;
 
+import me.darrionat.matrixlib.algebra.sets.Complex;
+import me.darrionat.matrixlib.algebra.sets.Number;
 import me.darrionat.matrixlib.builder.MatrixBuilder;
 import me.darrionat.matrixlib.exceptions.DimensionException;
 import me.darrionat.matrixlib.util.MatrixIterator;
-import me.darrionat.matrixlib.algebra.sets.Rational;
 
 import java.util.Iterator;
 
@@ -12,7 +13,7 @@ import java.util.Iterator;
  *
  * @author Darrion Thornburgh
  */
-public abstract class OperableMatrix implements Iterable<Rational> {
+public abstract class OperableMatrix implements Iterable<Number> {
     /**
      * The amount of rows in the matrix, represented as M.
      */
@@ -25,7 +26,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * An two dimensional array representing the rows of a matrix and the values within them. <br> E.g. {@code double
      * value = entries[row][column]}
      */
-    protected Rational[][] entries;
+    protected Number[][] entries;
 
     /**
      * Creates a new MxN {@code OperableMatrix}.
@@ -44,17 +45,17 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param columnAmount The amount of columns in the matrix, represented as N.
      * @param entries      The values within the matrix
      */
-    public OperableMatrix(int rowAmount, int columnAmount, Rational[][] entries) {
+    public OperableMatrix(int rowAmount, int columnAmount, Number[][] entries) {
         if (rowAmount <= 0 || columnAmount <= 0)
             throw new DimensionException(Math.min(rowAmount, columnAmount));
         this.rowAmount = rowAmount;
         this.columnAmount = columnAmount;
 
         if (entries == null) {
-            this.entries = new Rational[rowAmount][columnAmount];
+            this.entries = new Number[rowAmount][columnAmount];
             MatrixIterator iterator = iterator();
             while (iterator.hasNext())
-                iterator.setValue(Rational.ZERO).next();
+                iterator.setValue(Complex.ZERO).next();
             return;
         }
         this.entries = entries;
@@ -92,7 +93,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      *
      * @return all values contained within the matrix,
      */
-    public Rational[][] getEntries() {
+    public Number[][] getEntries() {
         return entries;
     }
 
@@ -103,7 +104,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param column the index of the column.
      * @return the value within the matrix at that given row and column.
      */
-    public Rational getValue(int row, int column) {
+    public Number getValue(int row, int column) {
         return entries[row][column];
     }
 
@@ -114,7 +115,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param column the index of the column.
      * @param value  the value to set.
      */
-    public void setValue(int row, int column, Rational value) {
+    public void setValue(int row, int column, Number value) {
         entries[row][column] = value;
     }
 
@@ -124,7 +125,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param row the index of the row
      * @return returns a row vector within the matrix.
      */
-    public Rational[] getRow(int row) {
+    public Number[] getRow(int row) {
         return entries[row];
     }
 
@@ -135,7 +136,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param values the values of the row vector.
      * @throws IllegalArgumentException the new row has more values than there are columns in the matrix.
      */
-    public void setRow(int row, Rational[] values) {
+    public void setRow(int row, Number[] values) {
         if (values.length != columnAmount)
             throw new IllegalArgumentException(ILLEGAL_ROW);
         entries[row] = values;
@@ -147,8 +148,8 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param column the index of the column
      * @return returns a column vector within the matrix.
      */
-    public Rational[] getColumn(int column) {
-        Rational[] toReturn = new Rational[rowAmount];
+    public Number[] getColumn(int column) {
+        Number[] toReturn = new Number[rowAmount];
         for (int row = 0; row < rowAmount; row++)
             toReturn[row] = entries[row][column];
         return toReturn;
@@ -161,7 +162,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param values the values of the column vector.
      * @throws IllegalArgumentException the new column has more values than there are rows in the matrix.
      */
-    public void setColumn(int column, Rational[] values) {
+    public void setColumn(int column, Number[] values) {
         if (values.length != rowAmount)
             throw new IllegalArgumentException(ILLEGAL_COLUMN);
         for (int row = 0; row < rowAmount; row++)
@@ -176,8 +177,8 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      */
     public void swapRows(int a, int b) {
         if (a == b) return;
-        Rational[] row1 = getRow(a);
-        Rational[] row2 = getRow(b);
+        Number[] row1 = getRow(a);
+        Number[] row2 = getRow(b);
         setRow(a, row2);
         setRow(b, row1);
     }
@@ -189,8 +190,8 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param b the index of the second column.
      */
     public void swapColumns(int a, int b) {
-        Rational[] col1 = getColumn(a);
-        Rational[] col2 = getColumn(b);
+        Number[] col1 = getColumn(a);
+        Number[] col2 = getColumn(b);
         setColumn(a, col2);
         setColumn(b, col1);
     }
@@ -201,7 +202,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param row    the row being scaled.
      * @param scalar the value to multiply the row by.
      */
-    public void multiplyRow(int row, Rational scalar) {
+    public void multiplyRow(int row, Number scalar) {
         for (int column = 0; column < columnAmount; column++)
             setValue(row, column, getValue(row, column).multiply(scalar));
     }
@@ -212,10 +213,10 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param row      the row being divided.
      * @param dividend the value to divide the row by.
      */
-    public void divideRow(int row, Rational dividend) {
+    public void divideRow(int row, Number dividend) {
         if (dividend.zero())
             throw new ArithmeticException("Cannot divide by zero");
-        multiplyRow(row, dividend.reciprocal());
+        multiplyRow(row, dividend.pow(-1));
     }
 
     /**
@@ -224,7 +225,7 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param column the column being scaled.
      * @param scalar the value to multiply the column by.
      */
-    public void multiplyColumn(int column, Rational scalar) {
+    public void multiplyColumn(int column, Number scalar) {
         for (int row = 0; row < columnAmount; row++)
             setValue(row, column, getValue(row, column).multiply(scalar));
     }
@@ -235,10 +236,10 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param column   the column being divided.
      * @param dividend the value to divide the row by.
      */
-    public void divideColumn(int column, Rational dividend) {
+    public void divideColumn(int column, Number dividend) {
         if (dividend.zero())
             throw new ArithmeticException("Cannot divide by zero");
-        multiplyColumn(column, dividend.reciprocal());
+        multiplyColumn(column, dividend.pow(-1));
     }
 
     /**
@@ -248,9 +249,9 @@ public abstract class OperableMatrix implements Iterable<Rational> {
      * @param addendRow    the row being scaled and added to {@code row}.
      * @param addendScalar the scalar that the {@code addend} is being multiplied by.
      */
-    public void rowSum(int row, int addendRow, Rational addendScalar) {
+    public void rowSum(int row, int addendRow, Number addendScalar) {
         for (int column = 0; column < columnAmount; column++) {
-            Rational toAdd = getValue(addendRow, column).multiply(addendScalar);
+            Number toAdd = getValue(addendRow, column).multiply(addendScalar);
             setValue(row, column, getValue(row, column).add(toAdd));
         }
     }
