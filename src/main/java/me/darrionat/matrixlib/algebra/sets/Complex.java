@@ -3,15 +3,14 @@ package me.darrionat.matrixlib.algebra.sets;
 import me.darrionat.matrixlib.algebra.exceptions.NonRealException;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 
 /**
  * An immutable data type for values within the complex plane.
  *
  * @author Darrion Thornburgh
  */
-public class Complex extends Number {
-
+public class Complex extends Quantity {
+    private static final long serialVersionUID = 5272893444149685952L;
     /**
      * The complex representation of zero.
      */
@@ -20,14 +19,6 @@ public class Complex extends Number {
      * The complex representation of one.
      */
     public static final Complex ONE = new Complex(Rational.ONE, Rational.ZERO);
-    /**
-     * A cache that represents powers of this complex number.
-     * <p>
-     * Key is the power to raise to, and the value is the result.
-     *
-     * @see #pow(int)
-     */
-    private final HashMap<Integer, Number> powers = new HashMap<>();
 
     /**
      * The real value in the complex plane.
@@ -47,8 +38,6 @@ public class Complex extends Number {
     public Complex(Rational real, Rational imaginaryScalar) {
         this.real = real;
         this.scalar = imaginaryScalar;
-        powers.put(0, ONE);
-        powers.put(1, this);
     }
 
     /**
@@ -72,10 +61,10 @@ public class Complex extends Number {
     }
 
     @Override
-    public Number add(Number b) {
+    public Quantity add(Quantity b) {
         if (b instanceof Rational) {
-            Rational rationalB = (Rational) b;
-            return new Complex((Rational) real.add(rationalB), scalar);
+            Rational rational = (Rational) b;
+            return new Complex((Rational) real.add(rational), scalar);
         }
         assert b instanceof Complex;
         Complex complex = (Complex) b;
@@ -85,15 +74,15 @@ public class Complex extends Number {
     }
 
     @Override
-    public Number subtract(Number b) {
+    public Quantity subtract(Quantity b) {
         return add(b.negate());
     }
 
     @Override
-    public Number multiply(Number b) {
+    public Quantity multiply(Quantity b) {
         if (b instanceof Rational) {
-            Rational rationalB = (Rational) b;
-            return new Complex(real.multiplyRational(rationalB), scalar.multiplyRational(rationalB));
+            Rational rational = (Rational) b;
+            return new Complex(real.multiplyRational(rational), scalar.multiplyRational(rational));
         }
         /*
            (a+bi)(c+di) = ac+adi+bci+bdi^2 = ac+bdi^2+adi+bci
@@ -109,10 +98,10 @@ public class Complex extends Number {
     }
 
     @Override
-    public Number divide(Number b) {
+    public Quantity divide(Quantity b) {
         if (b instanceof Rational) {
-            Rational rationalB = (Rational) b;
-            return new Complex(real.divideRational(rationalB), scalar.divideRational(rationalB));
+            Rational rational = (Rational) b;
+            return new Complex(real.divideRational(rational), scalar.divideRational(rational));
         }
         /*
            (a+bi)   (c-di)   (ac-bd) + (bc-ad)i
@@ -131,32 +120,12 @@ public class Complex extends Number {
         return new Complex(r.divideRational(divisor), c.divideRational(divisor));
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Number pow(int pow) {
-        if (powers.containsKey(pow))
-            return powers.get(pow);
-
-        // Convert into binary representation
-        // 55 -> 32+16+0+4+2+1 -> 110111
-        String binary = Integer.toBinaryString(Math.abs(pow));
-        // Determine all values of the powers of 2 of this complex number
-        // Start at the 2nd to last binary digit because the last is already known, because it represents 2^0 or 1.
-        for (int i = binary.length() - 2, expo = 1; i >= 0; i--, expo++) {
-            int powerOfTwo = (int) Math.pow(2, expo);
-            // Get the previous power of two, e.g. 32 -> 16
-            Number prev = powers.get(powerOfTwo / 2);
-            // Get this current power of two e.g. 32 -> complex ^ 2
-            powers.put(powerOfTwo, prev.multiply(prev));
-        }
-
-        Number result = ONE;
-        for (int i = binary.length() - 1, expo = 0; i >= 0; i--, expo++) {
-            int powerOfTwo = (int) Math.pow(2, expo);
-            if (binary.charAt(i) == '1')
-                result = result.multiply(powers.get(powerOfTwo));
-        }
-        return result;
+    public Complex pow(int pow) {
+        return (Complex) super.pow(pow);
     }
 
     @Override
@@ -170,9 +139,9 @@ public class Complex extends Number {
     }
 
     @Override
-    public int toInt() throws ArithmeticException {
+    public int intValue() throws ArithmeticException {
         if (!isReal()) throw new ArithmeticException("Imaginary value");
-        return toRational().toInt();
+        return toRational().intValue();
     }
 
     /**
@@ -189,10 +158,14 @@ public class Complex extends Number {
     public static Complex parseComplex(String s) {
         if (s == null) throw new NumberFormatException();
         String[] complex = s.split("\\+");
-        Rational r = Rational.parseRational(complex[0]);
+        String x = complex[0];
+        Rational r = Rational.parseRational(x.replace("i", ""));
 
-        if (complex.length != 2)
+        if (complex.length != 2) {
+            if (x.contains("i"))
+                return new Complex(Rational.ZERO, r);
             return new Complex(r, Rational.ZERO);
+        }
         Rational c = Rational.parseRational(complex[1].replace("i", ""));
         return new Complex(r, c);
     }
@@ -207,7 +180,7 @@ public class Complex extends Number {
      * @see #equals(Object)
      */
     @Override
-    public int compareTo(Number b) {
+    public int compareTo(Quantity b) {
         Complex compare;
         if (b instanceof Complex)
             compare = (Complex) b;
@@ -227,23 +200,24 @@ public class Complex extends Number {
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
-
-        if (obj instanceof Rational && scalar.zero()) {
+        if (obj instanceof Rational && scalar.zero())
             return obj.equals(real);
-        }
-
         if (!(obj instanceof Complex)) return false;
         Complex b = (Complex) obj;
         return real.equals(b.real) && scalar.equals(b.scalar);
     }
 
+    @Override
     public String toString() {
         if (scalar.zero()) return real.toString();
-        return real.toString() + "+" + scalar + "i";
+        if (real.zero()) return scalar + "i";
+        return real + "+" + scalar + "i";
     }
 
+    @Override
     public int hashCode() {
         return toString().hashCode();
     }

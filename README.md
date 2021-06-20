@@ -6,7 +6,7 @@ intended to be continually expanded.
 
 ## Maven ![maven](https://img.shields.io/github/v/release/Darrionat/MatrixLib)
 
-To add this this project to your Maven project make sure you have the following repository and dependency.
+To add this project to your Maven project make sure you have the following repository and dependency.
 
 ### Repository
 

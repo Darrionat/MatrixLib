@@ -1,6 +1,6 @@
 package me.darrionat.matrixlib.util;
 
-import me.darrionat.matrixlib.algebra.sets.Number;
+import me.darrionat.matrixlib.algebra.sets.Quantity;
 import me.darrionat.matrixlib.matrices.Matrix;
 import me.darrionat.matrixlib.matrices.OperableMatrix;
 
@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
  *
  * @author Darrion Thornburgh
  */
-public class MatrixIterator implements Iterator<Number> {
+public class MatrixIterator implements Iterator<Quantity> {
     private final OperableMatrix matrix;
     /**
      * Used for iterating over rows
@@ -34,18 +34,24 @@ public class MatrixIterator implements Iterator<Number> {
      * @param value the new value.
      * @return the iterator.
      */
-    public MatrixIterator setValue(Number value) {
+    public MatrixIterator setValue(Quantity value) {
         matrix.setValue(i, j, value);
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasNext() {
         return i != matrix.getRowAmount() - 1 || j != matrix.getColumnAmount() - 1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Number next() {
+    public Quantity next() {
         if (!hasNext())
             throw new NoSuchElementException("There are no remaining values within the Matrix");
         if (j == matrix.getColumnAmount() - 1) {

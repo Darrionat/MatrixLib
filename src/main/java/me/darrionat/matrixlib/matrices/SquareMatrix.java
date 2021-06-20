@@ -1,7 +1,7 @@
 package me.darrionat.matrixlib.matrices;
 
 import me.darrionat.matrixlib.algebra.sets.Complex;
-import me.darrionat.matrixlib.algebra.sets.Number;
+import me.darrionat.matrixlib.algebra.sets.Quantity;
 
 /**
  * Represents an NxN {@link Matrix} with an equal amount of rows and columns.
@@ -28,7 +28,7 @@ public class SquareMatrix extends Matrix {
      * @param dimension The amount of rows and columns the matrix will have
      * @param entries   The values of the matrix.
      */
-    public SquareMatrix(int dimension, Number[][] entries) {
+    public SquareMatrix(int dimension, Quantity[][] entries) {
         super(dimension, dimension, entries);
     }
 
@@ -49,10 +49,10 @@ public class SquareMatrix extends Matrix {
      *
      * @return the determinant of the matrix.
      */
-    public Number det() {
-        Matrix copy = copy();
+    public Quantity det() {
+        Matrix copy = clone();
         copy.ref();
-        Number det = Complex.ZERO;
+        Quantity det = Complex.ZERO;
         for (int pivot = 0; pivot < rowAmount; pivot++)
             det = det.multiply(copy.getValue(pivot, pivot));
         return det;

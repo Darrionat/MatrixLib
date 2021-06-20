@@ -1,4 +1,4 @@
-import me.darrionat.matrixlib.algebra.sets.Number;
+import me.darrionat.matrixlib.algebra.sets.Quantity;
 import me.darrionat.matrixlib.algebra.sets.Rational;
 import me.darrionat.matrixlib.matrices.Matrix;
 import me.darrionat.matrixlib.matrices.SquareMatrix;
@@ -43,7 +43,6 @@ public class TestMatrix {
         time("Det");
         System.out.println(matrix.det());
         endTime("Det");
-
 
         time("Compression");
         CompressionHandler compress = new CompressionHandler();
@@ -113,10 +112,10 @@ public class TestMatrix {
         // Read rows
         for (int i = 0; i < rows; i++) {
             String[] rowStr = readInputs.get(i);
-            Rational[] row = new Rational[cols];
+            Quantity[] row = new Quantity[cols];
             // From string to double
             for (int j = 0; j < cols; j++) {
-                row[j] = Rational.parseRational(rowStr[j]);
+                row[j] = Quantity.parseNumber(rowStr[j]);
             }
             // Insert row into matrix
             matrix.setRow(i, row);
@@ -136,9 +135,9 @@ public class TestMatrix {
         try {
             writer = new FileWriter(file);
             for (int i = 0; i < matrix.getRowAmount(); i++) {
-                Number[] row = matrix.getRow(i);
+                Quantity[] row = matrix.getRow(i);
                 StringBuilder line = new StringBuilder();
-                for (Number v : row) {
+                for (Quantity v : row) {
                     if (line.length() == 0) {
                         line = new StringBuilder("" + v);
                         continue;

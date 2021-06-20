@@ -1,9 +1,9 @@
 package me.darrionat.matrixlib.builder;
 
+import me.darrionat.matrixlib.algebra.sets.Quantity;
 import me.darrionat.matrixlib.exceptions.ReadMatrixException;
 import me.darrionat.matrixlib.matrices.Matrix;
 import me.darrionat.matrixlib.matrices.SquareMatrix;
-import me.darrionat.matrixlib.algebra.sets.Rational;
 
 /**
  * Provides methods for creating matrices from strings.
@@ -71,7 +71,7 @@ public class MatrixBuilder {
             }
             // Set values
             for (int col = 0; col < columns; col++)
-                matrix.setValue(row, col, Rational.parseRational(colValues[col]));
+                matrix.setValue(row, col, Quantity.parseNumber(colValues[col]));
         }
         if (matrix == null) throw new NullPointerException("Empty Matrix");
         return matrix;

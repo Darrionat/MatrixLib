@@ -1,7 +1,7 @@
 package me.darrionat.matrixlib.matrices;
 
 import me.darrionat.matrixlib.algebra.sets.Complex;
-import me.darrionat.matrixlib.algebra.sets.Number;
+import me.darrionat.matrixlib.algebra.sets.Quantity;
 import me.darrionat.matrixlib.algebra.sets.Rational;
 import me.darrionat.matrixlib.exceptions.DimensionException;
 import me.darrionat.matrixlib.exceptions.MatrixMultiplicationDimensionException;
@@ -33,7 +33,7 @@ public class Matrix extends OperableMatrix {
      * @param columnAmount The amount of columns in the matrix, represented as N.
      * @param entries      The values within the matrix
      */
-    public Matrix(int rowAmount, int columnAmount, Number[][] entries) {
+    public Matrix(int rowAmount, int columnAmount, Quantity[][] entries) {
         super(rowAmount, columnAmount, entries);
     }
 
@@ -42,8 +42,8 @@ public class Matrix extends OperableMatrix {
      *
      * @return {@code true} if all entries are zero; {@code false} otherwise.
      */
-    public boolean isZero() {
-        for (Number value : this)
+    public boolean zero() {
+        for (Quantity value : this)
             if (!value.zero()) return false;
         return true;
     }
@@ -52,9 +52,10 @@ public class Matrix extends OperableMatrix {
      * Gets the a {@code Matrix} whose values are all a multiple of this matrix's entries by a factor of the {@code
      * scalar}.
      *
-     * @param scalar the multiplier.
+     * @param scalar The multiplier.
+     * @return The result of this matrix being scaled by the given quantity.
      */
-    public Matrix scale(Rational scalar) {
+    public Matrix scale(Quantity scalar) {
         Matrix scaledMatrix = new Matrix(rowAmount, columnAmount, entries);
         for (int row = 0; row < rowAmount; row++)
             for (int col = 0; col < columnAmount; col++)
@@ -63,7 +64,7 @@ public class Matrix extends OperableMatrix {
     }
 
     /**
-     * Get the entrywise sum of this matrix and another matrix.
+     * Get the entry-wise sum of this matrix and another matrix.
      * <p>
      * The dimensions of this matrix are MxN. The {@code addend} must also be a MxN matrix. The sum will be a MxN
      * matrix.
@@ -84,7 +85,6 @@ public class Matrix extends OperableMatrix {
         return sum;
     }
 
-
     /**
      * Get the product of this matrix and another through row column matrix multiplication.
      * <p>
@@ -104,12 +104,12 @@ public class Matrix extends OperableMatrix {
         Matrix product = new Matrix(rowAmount, multiplier.columnAmount);
         for (int row = 0; row < rowAmount; row++) {
             // The row to be multiplied along
-            Number[] rowVector = getRow(row);
+            Quantity[] rowVector = getRow(row);
             for (int col = 0; col < multiplier.columnAmount; col++) {
                 // The vector multiplying the row
-                Number[] columnVector = multiplier.getColumn(col);
+                Quantity[] columnVector = multiplier.getColumn(col);
                 // Dot product of the two vectors
-                Number dotProduct = getDotProduct(rowVector, columnVector);
+                Quantity dotProduct = getDotProduct(rowVector, columnVector);
                 // Set the position to the dot product
                 product.setValue(row, col, dotProduct);
             }
@@ -143,10 +143,10 @@ public class Matrix extends OperableMatrix {
 
             // Use  row operations to put zeros (strictly) below the pivot
             for (int r = col + 1; r < rowAmount; r++) {
-                Number value = getValue(r, leftMostNonZeroCol);
+                Quantity value = getValue(r, leftMostNonZeroCol);
                 if (value.zero()) continue;
                 // The value to scale the subtracting row by to make the entry zero
-                Number c = value.divide(getValue(col, leftMostNonZeroCol));
+                Quantity c = value.divide(getValue(col, leftMostNonZeroCol));
                 rowSum(r, col, c.negate());
             }
         }
@@ -163,7 +163,7 @@ public class Matrix extends OperableMatrix {
         //  Make all leading pivots equal to 1
         for (int row = 0; row < rowAmount; row++)
             for (int col = row; col < columnAmount; col++) {
-                Number value = getValue(row, col);
+                Quantity value = getValue(row, col);
                 if (!value.zero()) {
                     divideRow(row, value);
                     break;
@@ -177,7 +177,8 @@ public class Matrix extends OperableMatrix {
             int pivotRow = -1, pivotCol = -1;
             for (int r = row; r >= 0 && pivotRow == -1; r--) {
                 for (int c = 0; c < columnAmount; c++) {
-                    if (!getValue(r, c).equals(Rational.ONE)) continue;
+                    Quantity value = getValue(r, c);
+                    if (!value.equals(Rational.ONE) && !value.equals(Complex.ONE)) continue;
                     pivotRow = r;
                     pivotCol = c;
                     break;
@@ -189,7 +190,7 @@ public class Matrix extends OperableMatrix {
              * Use row operations to erase all the non-zero entries above the leading one in the pivot column.
              */
             for (int r = pivotRow - 1; r >= 0; r--) {
-                Number value = getValue(r, pivotCol);
+                Quantity value = getValue(r, pivotCol);
                 if (value.zero()) continue;
                 // The value to scale the subtracting row by to make the entry zero
                 rowSum(r, row, getValue(r, pivotCol).negate());
@@ -205,11 +206,11 @@ public class Matrix extends OperableMatrix {
      * @return Returns the dot product of two vectors
      * @throws IllegalArgumentException thrown when the vectors' dimensions are not equal.
      */
-    private static Number getDotProduct(Number[] v, Number[] u) {
+    private static Quantity getDotProduct(Quantity[] v, Quantity[] u) {
         if (v.length != u.length)
             throw new IllegalArgumentException(DIMENSION_ERROR);
 
-        Number dotProduct = Complex.ZERO;
+        Quantity dotProduct = Complex.ZERO;
         for (int i = 0; i < v.length; i++)
             dotProduct = dotProduct.add(v[i].multiply(u[i]));
         return dotProduct;

@@ -1,6 +1,6 @@
 package me.darrionat.matrixlib.matrices;
 
-import me.darrionat.matrixlib.algebra.sets.Number;
+import me.darrionat.matrixlib.algebra.sets.Quantity;
 import me.darrionat.matrixlib.algebra.sets.Rational;
 
 /**
@@ -23,20 +23,20 @@ public final class IdentityMatrix extends SquareMatrix {
      */
     public IdentityMatrix(int dimension) {
         super(dimension);
-        for (int pivot = 0; pivot < rowAmount; pivot++)
-            super.setValue(pivot, pivot, Rational.ONE);
+        for (int i = 0; i < rowAmount; i++)
+            super.setValue(i, i, Rational.ONE);
     }
 
     @Override
-    public final void setColumn(int column, Number[] values) {
+    public final void setColumn(int column, Quantity[] values) {
     }
 
     @Override
-    public final void setRow(int row, Number[] values) {
+    public final void setRow(int row, Quantity[] values) {
     }
 
     @Override
-    public final void setValue(int row, int column, Number value) {
+    public final void setValue(int row, int column, Quantity value) {
     }
 
     @Override
@@ -48,19 +48,19 @@ public final class IdentityMatrix extends SquareMatrix {
     }
 
     @Override
-    public final void multiplyRow(int row, Number scalar) {
+    public final void multiplyRow(int row, Quantity scalar) {
     }
 
     @Override
-    public final void divideRow(int row, Number dividend) {
+    public final void divideRow(int row, Quantity dividend) {
     }
 
     @Override
-    public final void multiplyColumn(int column, Number scalar) {
+    public final void multiplyColumn(int column, Quantity scalar) {
     }
 
     @Override
-    public final void divideColumn(int column, Number dividend) {
+    public final void divideColumn(int column, Quantity dividend) {
     }
 
     @Override

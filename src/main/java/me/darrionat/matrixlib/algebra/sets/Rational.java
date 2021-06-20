@@ -10,7 +10,8 @@ import java.math.BigInteger;
  *
  * @author Robert Sedgewick, Kevin Wayne, and Darrion Thornburgh
  */
-public class Rational extends Number {
+public class Rational extends Quantity {
+    private static final long serialVersionUID = 1459424736841695044L;
     /**
      * The {@code Rational} representation of {@code 0}.
      */
@@ -19,6 +20,10 @@ public class Rational extends Number {
      * The {@code Rational} representation of {@code 1}.
      */
     public static final Rational ONE = new Rational(BigInteger.ONE, BigInteger.ONE);
+    /**
+     * The string used to separate the numerator and denominator of the rational.
+     */
+    private static final String SEP = " over ";
     /**
      * The numerator
      */
@@ -89,6 +94,8 @@ public class Rational extends Number {
 
     /**
      * Gets the {@code Rational} represented as a BigInteger.
+     * <p>
+     * Equal to {@code numerator/denominator}.
      *
      * @return the fraction represented as a BigInteger.
      */
@@ -96,19 +103,24 @@ public class Rational extends Number {
         return num.divide(den);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean zero() {
         return this.equals(ZERO);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public int toInt() throws ArithmeticException {
+    public int intValue() throws ArithmeticException {
         try {
             return Integer.parseInt(toBigInteger().toString());
         } catch (NumberFormatException e) {
             throw new ArithmeticException("Out of int bounds");
         }
     }
-
 
     /**
      * Gets the mediant of two rational numbers.
@@ -117,14 +129,13 @@ public class Rational extends Number {
      * <p>
      * {@code (1+2)/(3+4)}
      *
-     * @param r the first rational.
-     * @param s the second rational.
+     * @param r The first rational.
+     * @param s The second rational.
+     * @return The mediant of the two given rationals.
      */
     public static Rational mediant(Rational r, Rational s) {
         return new Rational(r.num.add(s.num), r.den.add(s.den));
     }
-
-    // return gcd(|m|, |n|)
 
     /**
      * Gets the greatest common denominator between two integers.
@@ -154,10 +165,13 @@ public class Rational extends Number {
         return m.multiply(n.divide(gcd(m, n)));
     }
 
-    public Number add(Number b) {
+    /**
+     * {@inheritDoc}
+     */
+    public Quantity add(Quantity b) {
         if (b instanceof Complex) {
             Complex complex = (Complex) b;
-            return complex.add(b);
+            return complex.add(this);
         }
         assert b instanceof Rational;
         Rational rational = (Rational) b;
@@ -180,12 +194,17 @@ public class Rational extends Number {
         return new Rational(crossProduct.multiply(f), lcm(a.den, rational.den));
     }
 
-    public Number subtract(Number b) {
+    /**
+     * {@inheritDoc}
+     */
+    public Quantity subtract(Quantity b) {
         return add(b.negate());
     }
 
-
-    public Number multiply(Number b) {
+    /**
+     * {@inheritDoc}
+     */
+    public Quantity multiply(Quantity b) {
         if (b instanceof Complex) {
             Complex complex = (Complex) b;
             return complex.multiply(b);
@@ -195,7 +214,10 @@ public class Rational extends Number {
         return new Rational(num.multiply(rational.num), den.multiply(rational.den));
     }
 
-    public Number divide(Number b) {
+    /**
+     * {@inheritDoc}
+     */
+    public Quantity divide(Quantity b) {
         if (b instanceof Complex) {
             Complex complex = (Complex) b;
             return complex.pow(-1).multiply(this);
@@ -205,24 +227,66 @@ public class Rational extends Number {
         return multiply(rational.reciprocal());
     }
 
+    /**
+     * Gets the result of this rational added to another.
+     *
+     * @param b The addend.
+     * @return The sum of this rational and the other rational.
+     */
     public Rational addRational(Rational b) {
         return (Rational) add(b);
     }
 
+    /**
+     * Gets the result of this rational subtracted by another.
+     *
+     * @param b The difference to subtract by.
+     * @return The difference of this rational and the other rational.
+     */
     public Rational subtractRational(Rational b) {
         return (Rational) subtract(b);
     }
 
+    /**
+     * Gets the product of this rational and another.
+     *
+     * @param b The rational to multiply by.
+     * @return The product of this rational and the multiplicand.
+     */
     public Rational multiplyRational(Rational b) {
         return (Rational) multiply(b);
     }
 
+    /**
+     * Gets the result of this rational divided by another.
+     *
+     * @param b The dividend.
+     * @return The quotient of this rational divided by the passed rational dividend.
+     */
     public Rational divideRational(Rational b) {
         return (Rational) divide(b);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Rational negate() {
         return new Rational(num.negate(), den);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Rational pow(int pow) {
+        if (pow == 0)
+            return ONE;
+        BigInteger num = this.num.pow(Math.abs(pow));
+        BigInteger den = this.den.pow(Math.abs(pow));
+        if (pow > 0)
+            return new Rational(num, den);
+        else
+            return new Rational(den, num);
     }
 
     /**
@@ -244,17 +308,6 @@ public class Rational extends Number {
         return new Rational(den, num);
     }
 
-    public Rational pow(int pow) {
-        if (pow == 0)
-            return ONE;
-        BigInteger num = this.num.pow(Math.abs(pow));
-        BigInteger den = this.den.pow(Math.abs(pow));
-        if (pow > 0)
-            return new Rational(num, den);
-        else
-            return new Rational(den, num);
-    }
-
     /**
      * Parses a {@code Rational} from a string.
      * <p>
@@ -267,7 +320,7 @@ public class Rational extends Number {
     public static Rational parseRational(String s) {
         if (s == null) throw new NumberFormatException();
 
-        String[] fraction = s.split("/");
+        String[] fraction = s.split(SEP);
 
         BigInteger num = new BigInteger(fraction[0]);
 
@@ -286,7 +339,7 @@ public class Rational extends Number {
      * @param b The Rational to compare to.
      * @return returns an integer that is the comparison between the two rationals.
      */
-    public int compareTo(Number b) {
+    public int compareTo(Quantity b) {
         if (b instanceof Complex) {
             Complex complex = (Complex) b;
             return complex.compareTo(this);
@@ -311,7 +364,7 @@ public class Rational extends Number {
     @Override
     public String toString() {
         if (den.equals(BigInteger.ONE)) return num + "";
-        return num + "/" + den;
+        return num + SEP + den;
     }
 
     @Override
