@@ -28,46 +28,46 @@ public final class IdentityMatrix extends SquareMatrix {
     }
 
     @Override
-    public final void setColumn(int column, Quantity[] values) {
+    public void setColumn(int column, Quantity[] values) {
     }
 
     @Override
-    public final void setRow(int row, Quantity[] values) {
+    public void setRow(int row, Quantity[] values) {
     }
 
     @Override
-    public final void setValue(int row, int column, Quantity value) {
+    public void setValue(int row, int column, Quantity value) {
     }
 
     @Override
-    public final void swapRows(int a, int b) {
+    public void swapRows(int a, int b) {
     }
 
     @Override
-    public final void swapColumns(int a, int b) {
+    public void swapColumns(int a, int b) {
     }
 
     @Override
-    public final void multiplyRow(int row, Quantity scalar) {
+    public void multiplyRow(int row, Quantity scalar) {
     }
 
     @Override
-    public final void divideRow(int row, Quantity dividend) {
+    public void divideRow(int row, Quantity dividend) {
     }
 
     @Override
-    public final void multiplyColumn(int column, Quantity scalar) {
+    public void multiplyColumn(int column, Quantity scalar) {
     }
 
     @Override
-    public final void divideColumn(int column, Quantity dividend) {
+    public void divideColumn(int column, Quantity dividend) {
     }
 
     @Override
-    public final void ref() {
+    public void ref() {
     }
 
     @Override
-    public final void rref() {
+    public void rref() {
     }
 }

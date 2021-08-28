@@ -92,7 +92,7 @@ public class Interpreter {
             return Quantity.parseNumber(splitExpression.get(0));
         String[] evaluate = splitExpression.toArray(new String[0]);
         while (evaluate.length >= 3) {
-            // Find operator with highest precedence
+            // Find operator with the highest precedence
             Operation operation = getHighestOperator(evaluate);
             assert operation != null;
             for (int i = 1; i < evaluate.length; i += 2) {

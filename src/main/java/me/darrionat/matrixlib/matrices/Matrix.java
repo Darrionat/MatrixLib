@@ -91,7 +91,7 @@ public class Matrix extends OperableMatrix {
      * The dimensions of this matrix are MxN. The {@code multiplier} must be a NxP matrix. The product will be a MxP
      * matrix.
      *
-     * @param multiplier Another matrix that has an amount of rows equal to the amount of columns of this matrix.
+     * @param multiplier Another matrix that has an amount of rows which equals the amount of columns of this matrix.
      * @return Calculates the product of this matrix and another matrix.
      * @throws MatrixMultiplicationDimensionException thrown when the matrices are not compatible.
      */
