@@ -45,10 +45,11 @@ public class MatrixBuilder {
      *
      * @param matrixString A matrix in the form of a string.
      * @return Returns a built matrix created from a string.
+     * @throws ReadMatrixException Thrown when {@code matrixString} is formatted incorrectly.
      */
-    public static Matrix parseMatrix(String matrixString) {
+    public static Matrix parseMatrix(String matrixString) throws ReadMatrixException {
         char[] chars = matrixString.toCharArray();
-        assertValidChars(chars, MATRIX_START, MATRIX_END);
+        requireValidChars(chars, MATRIX_START, MATRIX_END);
 
         String[] allRows = matrixString.replace(MATRIX_START + "", "").replace(MATRIX_END + "", "").split(ROW_SEPARATOR);
 
@@ -59,7 +60,7 @@ public class MatrixBuilder {
         Matrix matrix = null;
         for (int row = 0; row < rows; row++) {
             char[] rowChars = allRows[row].toCharArray();
-            assertValidChars(rowChars, ROW_START, ROW_END);
+            requireValidChars(rowChars, ROW_START, ROW_END);
 
             // Split the column
             String[] colValues = allRows[row].replace(ROW_START + "", "").replace(ROW_END + "", "").split(SEPARATOR);
@@ -83,8 +84,9 @@ public class MatrixBuilder {
      * @param arr   The array of characters to check
      * @param start The required starting character
      * @param end   The required ending character
+     * @throws ReadMatrixException Thrown when an invalid character appears
      */
-    private static void assertValidChars(char[] arr, char start, char end) {
+    private static void requireValidChars(char[] arr, char start, char end) throws ReadMatrixException {
         // Start is invalid
         char first = arr[0];
         if (first != start)

@@ -1,5 +1,4 @@
 import me.darrionat.matrixlib.builder.MatrixBuilder;
-import me.darrionat.matrixlib.exceptions.ReadMatrixException;
 import me.darrionat.matrixlib.matrices.Matrix;
 
 import java.io.*;
@@ -32,12 +31,8 @@ public class CompressionHandler {
         ByteArrayInputStream bais = new ByteArrayInputStream(fileContent);
         GZIPInputStream gzipIn = new GZIPInputStream(bais);
         ObjectInputStream objectIn = new ObjectInputStream(gzipIn);
-        String matrixStr;
-        try {
-            matrixStr = (String) objectIn.readObject();
-        } catch (ArrayStoreException e) {
-            throw new ReadMatrixException(source);
-        }
+
+        String matrixStr = (String) objectIn.readObject();
         objectIn.close();
         return MatrixBuilder.parseMatrix(matrixStr);
     }

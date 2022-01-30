@@ -42,26 +42,9 @@ public enum Operation {
      * @throws IllegalArgumentException thrown when the string contains more than one operation.
      */
     public static Operation parseOperator(String s) throws IllegalArgumentException {
-        if (!containsOneOperation(s))
-            throw new IllegalArgumentException("Input must contain a single operator");
         for (Operation operation : values())
             if (s.contains(operation.getOperator())) return operation;
-        // Unreachable return
-        assert false;
-        return null;
-    }
-
-    /**
-     * Determines if a string contains a single operation.
-     *
-     * @param s The string to be read.
-     * @return {@code true} if the string contains a single one operation; {@code false} otherwise.
-     */
-    private static boolean containsOneOperation(String s) {
-        int count = 0;
-        for (Operation operation : values())
-            if (s.contains(operation.getOperator())) count++;
-        return count == 1;
+        throw new IllegalArgumentException("Input must contain a single operator");
     }
 
     /**

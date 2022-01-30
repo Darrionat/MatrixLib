@@ -15,6 +15,14 @@ import java.util.Iterator;
  */
 public abstract class OperableMatrix implements Iterable<Quantity> {
     /**
+     * Error message for when an incompatible row is given.
+     */
+    private static final String ILLEGAL_ROW = "Row length does not equal amount of columns";
+    /**
+     * Error message for when an incompatible column is given.
+     */
+    private static final String ILLEGAL_COLUMN = "Column length does not equal amount of rows";
+    /**
      * The amount of rows in the matrix, represented as M.
      */
     protected int rowAmount;
@@ -60,15 +68,6 @@ public abstract class OperableMatrix implements Iterable<Quantity> {
         }
         this.entries = entries;
     }
-
-    /**
-     * Error message for when an incompatible row is given.
-     */
-    private static final String ILLEGAL_ROW = "Row length does not equal amount of columns";
-    /**
-     * Error message for when an incompatible column is given.
-     */
-    private static final String ILLEGAL_COLUMN = "Column length does not equal amount of rows";
 
     /**
      * Gets the amount of rows within the matrix.
