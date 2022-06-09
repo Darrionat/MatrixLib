@@ -156,10 +156,9 @@ public class Matrix extends OperableMatrix {
      * Reduces the matrix into reduced row echelon form.
      */
     public void rref() {
-        ref();
         // Already in RREF
         if (rowAmount == 1) return;
-
+        ref();
         //  Make all leading pivots equal to 1
         for (int row = 0; row < rowAmount; row++)
             for (int col = row; col < columnAmount; col++) {

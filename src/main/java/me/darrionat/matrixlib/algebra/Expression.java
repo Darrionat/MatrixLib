@@ -5,6 +5,8 @@ import me.darrionat.matrixlib.algebra.exceptions.SyntaxException;
 import me.darrionat.matrixlib.algebra.sets.Quantity;
 import me.darrionat.matrixlib.util.KeyValue;
 
+import java.util.Objects;
+
 /**
  * Represents multiple operations that can be performed to obtain a result.
  * <p>
@@ -41,6 +43,7 @@ public class Expression {
      * @throws SyntaxException Thrown when the expression does not contain at least one operator or sequential operators.
      */
     public static Expression buildExpression(String s) throws SyntaxException {
+        Objects.requireNonNull(s, "Expression cannot be null");
         s = s.replaceAll("\\[", "(");
         s = s.replaceAll("]", ")");
         KeyValue<Integer, Integer> parens = getLeftRightParenCount(s);

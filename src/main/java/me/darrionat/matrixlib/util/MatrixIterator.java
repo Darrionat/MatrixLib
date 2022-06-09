@@ -44,7 +44,7 @@ public class MatrixIterator implements Iterator<Quantity> {
      */
     @Override
     public boolean hasNext() {
-        return i != matrix.getRowAmount() - 1 || j != matrix.getColumnAmount() - 1;
+        return !(i == matrix.getRowAmount() - 1 && j == matrix.getColumnAmount() - 1);
     }
 
     /**

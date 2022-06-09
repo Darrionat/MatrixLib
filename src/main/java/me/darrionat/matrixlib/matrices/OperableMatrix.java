@@ -31,7 +31,7 @@ public abstract class OperableMatrix implements Iterable<Quantity> {
      */
     protected int columnAmount;
     /**
-     * An two dimensional array representing the rows of a matrix and the values within them. <br> E.g. {@code double
+     * A two dimensional array representing the rows of a matrix and the values within them. <br> E.g. {@code double
      * value = entries[row][column]}
      */
     protected Quantity[][] entries;
@@ -189,6 +189,7 @@ public abstract class OperableMatrix implements Iterable<Quantity> {
      * @param b the index of the second column.
      */
     public void swapColumns(int a, int b) {
+        if (a == b) return;
         Quantity[] col1 = getColumn(a);
         Quantity[] col2 = getColumn(b);
         setColumn(a, col2);
