@@ -11,7 +11,6 @@ import java.math.BigInteger;
  * @author Robert Sedgewick, Kevin Wayne, and Darrion Thornburgh
  */
 public class Rational extends Quantity {
-    private static final long serialVersionUID = 1459424736841695044L;
     /**
      * The {@code Rational} representation of {@code 0}.
      */
@@ -20,6 +19,7 @@ public class Rational extends Quantity {
      * The {@code Rational} representation of {@code 1}.
      */
     public static final Rational ONE = new Rational(BigInteger.ONE, BigInteger.ONE);
+    private static final long serialVersionUID = 1459424736841695044L;
     /**
      * The string used to separate the numerator and denominator of the rational.
      */
@@ -75,6 +75,72 @@ public class Rational extends Quantity {
     }
 
     /**
+     * Gets the mediant of two rational numbers.
+     * <p>
+     * For example: {@code mediant(1/3, 2/4)} will return
+     * <p>
+     * {@code (1+2)/(3+4)}
+     *
+     * @param r The first rational.
+     * @param s The second rational.
+     * @return The mediant of the two given rationals.
+     */
+    public static Rational mediant(Rational r, Rational s) {
+        return new Rational(r.num.add(s.num), r.den.add(s.den));
+    }
+
+    /**
+     * Gets the greatest common denominator between two integers.
+     *
+     * @param m the first integer.
+     * @param n the second integer.
+     * @return the great common denominator of the passed integers.
+     */
+    private static BigInteger gcd(BigInteger m, BigInteger n) {
+        if (m.compareTo(BigInteger.ZERO) < 0) m = m.negate();
+        if (n.compareTo(BigInteger.ZERO) < 0) n = n.negate();
+        if (n.equals(BigInteger.ZERO)) return m;
+        else return gcd(n, m.mod(n));
+    }
+
+    /**
+     * Gets the least common multiple between two integers.
+     *
+     * @param m the first integer.
+     * @param n the second integer.
+     * @return the least common multiple of the passed integers.
+     */
+    private static BigInteger lcm(BigInteger m, BigInteger n) {
+        if (m.compareTo(BigInteger.ZERO) < 0) m = m.negate();
+        if (n.compareTo(BigInteger.ZERO) < 0) n = n.negate();
+        // m * (n / gcd(m,n))
+        return m.multiply(n.divide(gcd(m, n)));
+    }
+
+    /**
+     * Parses a {@code Rational} from a string.
+     * <p>
+     * The desired format: {@code numerator/denominator}.
+     *
+     * @param s The string containing the rational expression to be parsed.
+     * @return A fraction parsed from a string.
+     * @throws NumberFormatException Thrown when the input string is not a valid {@code Rational}.
+     */
+    public static Rational parseRational(String s) {
+        if (s == null) throw new NumberFormatException();
+
+        String[] fraction = s.split(SEP);
+
+        BigInteger num = new BigInteger(fraction[0]);
+
+        if (fraction.length != 2)
+            return new Rational(num, BigInteger.ONE);
+
+        BigInteger dem = new BigInteger(fraction[1]);
+        return new Rational(num, dem);
+    }
+
+    /**
      * Gets the numerator.
      *
      * @return the numerator of this rational.
@@ -120,49 +186,6 @@ public class Rational extends Quantity {
         } catch (NumberFormatException e) {
             throw new ArithmeticException("Out of int bounds");
         }
-    }
-
-    /**
-     * Gets the mediant of two rational numbers.
-     * <p>
-     * For example: {@code mediant(1/3, 2/4)} will return
-     * <p>
-     * {@code (1+2)/(3+4)}
-     *
-     * @param r The first rational.
-     * @param s The second rational.
-     * @return The mediant of the two given rationals.
-     */
-    public static Rational mediant(Rational r, Rational s) {
-        return new Rational(r.num.add(s.num), r.den.add(s.den));
-    }
-
-    /**
-     * Gets the greatest common denominator between two integers.
-     *
-     * @param m the first integer.
-     * @param n the second integer.
-     * @return the great common denominator of the passed integers.
-     */
-    private static BigInteger gcd(BigInteger m, BigInteger n) {
-        if (m.compareTo(BigInteger.ZERO) < 0) m = m.negate();
-        if (n.compareTo(BigInteger.ZERO) < 0) n = n.negate();
-        if (n.equals(BigInteger.ZERO)) return m;
-        else return gcd(n, m.mod(n));
-    }
-
-    /**
-     * Gets the least common multiple between two integers.
-     *
-     * @param m the first integer.
-     * @param n the second integer.
-     * @return the least common multiple of the passed integers.
-     */
-    private static BigInteger lcm(BigInteger m, BigInteger n) {
-        if (m.compareTo(BigInteger.ZERO) < 0) m = m.negate();
-        if (n.compareTo(BigInteger.ZERO) < 0) n = n.negate();
-        // m * (n / gcd(m,n))
-        return m.multiply(n.divide(gcd(m, n)));
     }
 
     /**
@@ -308,33 +331,17 @@ public class Rational extends Quantity {
         return new Rational(den, num);
     }
 
-    /**
-     * Parses a {@code Rational} from a string.
-     * <p>
-     * The desired format: {@code numerator/denominator}.
-     *
-     * @param s The string containing the rational expression to be parsed.
-     * @return A fraction parsed from a string.
-     * @throws NumberFormatException Thrown when the input string is not a valid {@code Rational}.
-     */
-    public static Rational parseRational(String s) {
-        if (s == null) throw new NumberFormatException();
-
-        String[] fraction = s.split(SEP);
-
-        BigInteger num = new BigInteger(fraction[0]);
-
-        if (fraction.length != 2)
-            return new Rational(num, BigInteger.ONE);
-
-        BigInteger dem = new BigInteger(fraction[1]);
-        return new Rational(num, dem);
+    public Rational mod(BigInteger modulus) {
+        if (!den.equals(BigInteger.ONE))
+            throw new IllegalStateException("Mod for non-integers not supported");
+        return new Rational(num.mod(modulus), BigInteger.ONE);
     }
 
     /**
      * Compares two {@code Rational}s.
      * <p>
-     * The result is less than zero if this is less than b, greater than zero if this is greater than b, and equal to zero when this and b are equal.
+     * The result is less than zero if this is less than b, greater than zero if this is greater than b, and equal to
+     * zero when this and b are equal.
      *
      * @param b The Rational to compare to.
      * @return returns an integer that is the comparison between the two rationals.
