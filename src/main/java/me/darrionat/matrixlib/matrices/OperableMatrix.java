@@ -257,6 +257,19 @@ public abstract class OperableMatrix implements Iterable<Quantity> {
     }
 
     /**
+     * Gets the transpose of this matrix.
+     *
+     * @return The transpose of this matrix.
+     */
+    public Matrix transpose() {
+        Matrix toReturn = new Matrix(columnAmount, rowAmount);
+        for (int row = 0; row < rowAmount; row++) {
+            toReturn.setColumn(row, getRow(row));
+        }
+        return toReturn;
+    }
+
+    /**
      * Creates a deep copy of this {@code Matrix}.
      *
      * @return a copy of the matrix.
